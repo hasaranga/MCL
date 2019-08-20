@@ -1,0 +1,82 @@
+
+/*
+	MCL - TTime.h
+	Copyright (C) 2019 CrownSoft
+
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+       appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+
+*/
+
+#pragma once
+
+#include <windows.h>
+#include "../containers/TLeakDetector.h"
+
+class TTime
+{
+public:
+
+	TTime(){}
+
+	// Returns time difference in units of 100 us.
+	static _int64 delta100us(const SYSTEMTIME &time1, const SYSTEMTIME &time2)
+	{
+		union timeunion {
+			FILETIME fileTime;
+			ULARGE_INTEGER ul;
+		};
+
+		timeunion ft1;
+		timeunion ft2;
+
+		SystemTimeToFileTime(&time1, &ft1.fileTime);
+		SystemTimeToFileTime(&time2, &ft2.fileTime);
+
+		return ft2.ul.QuadPart - ft1.ul.QuadPart;
+	}
+
+	// Returns time difference in seconds.
+	static _int64 deltaSeconds(const SYSTEMTIME& time1, const SYSTEMTIME& time2)
+	{
+		return (delta100us(time1, time2) / 10000000);
+	}
+
+	// Returns time difference in minutes.
+	static _int64 deltaMinutes(const SYSTEMTIME& time1, const SYSTEMTIME& time2)
+	{
+		return (deltaSeconds(time1, time2) / 60);
+	}
+
+	// Returns time difference in hours.
+	static _int64 deltaHours(const SYSTEMTIME& time1, const SYSTEMTIME& time2)
+	{
+		return (deltaMinutes(time1, time2) / 60);
+	}
+
+	static void getNow(SYSTEMTIME* time, const bool isLocalTime = true)
+	{
+		if (isLocalTime)
+			::GetLocalTime(time);
+		else
+			::GetSystemTime(time);
+	}
+
+	virtual ~TTime(){}
+
+private:
+	MCL_LEAK_DETECTOR(TTime)
+};
