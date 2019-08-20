@@ -16,3 +16,42 @@ Checkout example dir for usage of this framework.
 Send your bug reports/suggestions to support@crownsoft.net
 
 Requirements: C++14 compiler with __declspec(property) extension support! (Visual Studio, CLang)
+
+##Example Code
+
+```C++
+
+class MyApplication : public TApplication
+{
+protected:
+	TForm form1;
+	TButton button1;
+
+public:
+	int main(TString** argv, int argc)
+	{
+		form1.text = "My Window";
+		form1.maximizeButton = false;
+		form1.width = 400;
+		form1.height = 300;
+		form1.centerScreen();
+
+		button1.text = "Exit";
+		button1.left = 10;
+		button1.top = 10;
+		button1.parent = form1;
+		button1.onPress = EVENT(this, MyApplication::onButtonPress);
+
+		form1.visible = true;
+		TApplication::run();
+
+		return 0;
+	}
+
+	void onButtonPress(TComponent* sender)
+	{
+		form1.close();
+	}
+};
+
+```
