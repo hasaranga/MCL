@@ -5692,6 +5692,7 @@ TTimer::TTimer()
 	onTimer = nullptr;
 	resolution = 1000;
 	started = false;
+	ownerWindow = nullptr;
 
 	timerID = TPlatformUtil::getInstance()->generateTimerID(this);
 }
@@ -5706,9 +5707,9 @@ int TTimer::getInterval()
 	return resolution;
 }
 
-void TTimer::setTimerWindow(TWindow *window)
+void TTimer::setTimerWindow(TWindow &window)
 {
-	this->window = window;
+	ownerWindow = &window;
 }
 
 void TTimer::setTimerID(UINT timerID)
@@ -5721,33 +5722,35 @@ UINT TTimer::getTimerID()
 	return timerID;
 }
 
-void TTimer::startTimer()
+void TTimer::setEnabled(bool enable)
 {
-	if(started)
-		return;
-
-	if(window)
+	if (enable)
 	{
-		HWND hwnd = window->getHandle();
-		if(hwnd)
+		if (started)
+			return;
+
+		if (ownerWindow)
 		{
-			::SetTimer(hwnd, timerID, resolution, 0);
-			started = true;
+			HWND hwnd = ownerWindow->getHandle();
+			if (hwnd)
+			{
+				::SetTimer(hwnd, timerID, resolution, 0);
+				started = true;
+			}
 		}
 	}
-}
-
-void TTimer::stopTimer()
-{
-	if(window)
+	else
 	{
-		HWND hwnd = window->getHandle();
-		if(hwnd)
+		if (ownerWindow)
 		{
-			if(started)
-				::KillTimer(hwnd, timerID);
+			HWND hwnd = ownerWindow->getHandle();
+			if (hwnd)
+			{
+				if (started)
+					::KillTimer(hwnd, timerID);
 
-			started = false;
+				started = false;
+			}
 		}
 	}
 }
@@ -5760,7 +5763,7 @@ bool TTimer::isTimerRunning()
 TTimer::~TTimer()
 {
 	if(started)
-		this->stopTimer();
+		this->setEnabled(false);
 }
 
 // =========== TPerformanceCounter.cpp ===========

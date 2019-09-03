@@ -30,9 +30,8 @@
 /**
 	Encapsulates a timer.
 
-	The timer can be started with the startTimer() method
-	and controlled with various other methods. Before you start timer, you must set 
-	timer window by calling setTimerWindow method.
+	The timer can be started by setting "enabled" property.
+	Before you start the timer, you must set timer window by setting "window" property.
 */
 class TTimer
 {
@@ -40,9 +39,13 @@ protected:
 	UINT timerID;
 	int resolution;
 	bool started;
-	TWindow *window;
+	TWindow *ownerWindow;
 
 public:
+
+	PROPERTY_DEF(int, interval, getInterval, setInterval)
+	PROPERTY_DEF(bool, enabled, isTimerRunning, setEnabled)
+	PROPERTY_DEF_WRITEONLY(TWindow&, window, setTimerWindow)
 
 	// void onTimer(TTimer* timer)
 	EVENT_DEF(void, onTimer, TTimer*)
@@ -59,24 +62,16 @@ public:
 	/**
 		Call this method before you start the timer
 	*/
-	virtual void setTimerWindow(TWindow *window);
+	virtual void setTimerWindow(TWindow &window);
 
 	virtual void setTimerID(UINT timerID);
+
+	virtual void setEnabled(bool enable);
 
 	/**
 		@returns unique id of this timer
 	*/
 	virtual UINT getTimerID();
-
-	/**
-		Starts timer
-	*/
-	virtual void startTimer();
-
-	/**
-		Stops the timer. You can restart it by calling startTimer() method.
-	*/
-	virtual void stopTimer();
 
 	virtual bool isTimerRunning();
 
