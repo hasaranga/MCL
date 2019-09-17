@@ -1,8 +1,8 @@
 
 /*
-	MCL - TControl.h
+	MCL - TWinMenuBar.cpp
 	Copyright (C) 2019 CrownSoft
-
+  
 	This software is provided 'as-is', without any express or implied
 	warranty.  In no event will the authors be held liable for any damages
 	arising from the use of this software.
@@ -18,32 +18,32 @@
 	2. Altered source versions must be plainly marked as such, and must not be
 	   misrepresented as being the original software.
 	3. This notice may not be removed or altered from any source distribution.
-
+	  
 */
 
-#pragma once
+#include "TWinMenuBar.h"
 
-#include "TComponent.h"
-
-/**
-	Base class of all W32 child components
-*/
-class TControl : public TComponent
+TWinMenuBar::TWinMenuBar()
 {
-public:
-	TControl()
-	{
-		leftProperty = 0;
-		topProperty = 0;
+	hMenu = ::CreateMenu();
+}
 
-		styleProperty = WS_CHILD | WS_CLIPSIBLINGS;
-	}
+void TWinMenuBar::add(const TString& text, const TWinMenu& menu)
+{
+	::InsertMenuW(hMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(HMENU)menu, text);
+}
 
-private:
-	// control will create itself when you assign parent to it!
-	virtual void setParentImpl(HWND parentHandle) override
-	{
-		parentProperty = parentHandle;
-		this->create();
-	}
-};
+HMENU TWinMenuBar::getHandle()
+{
+	return hMenu;
+}
+
+TWinMenuBar::operator HMENU()const
+{
+	return hMenu;
+}
+
+TWinMenuBar::~TWinMenuBar()
+{
+	::DestroyMenu(hMenu);
+}

@@ -954,380 +954,6 @@ TIcon::~TIcon()
 		::DestroyIcon(hIcon);
 }
 
-// =========== TButton.cpp ===========
-
-/*
-	MCL - TButton.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TButton::TButton()
-{
-	onPress = nullptr;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("BUTTON"));
-	textProperty.assignStaticText(TXT_WITH_LEN("Button"));
-
-	widthProperty = 100;
-	heightProperty = 30;
-
-	styleProperty |= BS_NOTIFY | WS_TABSTOP;
-	extendedStyleProperty = WS_EX_WINDOWEDGE;
-}
-
-bool TButton::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
-	{
-		if (onPress)
-			onPress(this);
-
-		result = 0;
-		return true;
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TButton::create()
-{
-	if(!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-TButton::~TButton()
-{
-}
-
-// =========== TCheckBox.cpp ===========
-
-/*
-	MCL - TCheckBox.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TCheckBox::TCheckBox()
-{
-	valueProperty = false;
-	onCheck = nullptr;
-
-	widthProperty = 100;
-	heightProperty = 25;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("BUTTON"));
-	textProperty.assignStaticText(TXT_WITH_LEN("CheckBox"));
-
-	styleProperty |= BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP;
-}
-
-bool TCheckBox::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::SendMessageW(handleProperty, BM_SETCHECK, valueProperty ? BST_CHECKED : BST_UNCHECKED, 0);
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-bool TCheckBox::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
-	{
-		// update internal state
-		if (::SendMessageW(handleProperty, BM_GETCHECK, 0, 0) == BST_CHECKED)
-			valueProperty = true;
-		else
-			valueProperty = false;
-
-		// inform to event
-		if (onCheck)
-			onCheck(this);
-
-		result = 0;
-		return true;
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TCheckBox::getValue()
-{
-	return valueProperty;
-}
-
-void TCheckBox::setValue(bool state)
-{
-	valueProperty = state;
-
-	if(handleProperty)
-		::SendMessageW(handleProperty, BM_SETCHECK, valueProperty ? BST_CHECKED : BST_UNCHECKED, 0);
-}
-
-TCheckBox::~TCheckBox()
-{
-}
-
-// =========== TComboBox.cpp ===========
-
-/*
-	MCL - TComboBox.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-#define COMBOBOX_INITIAL_ITEM_ALLOCATION 50
-
-TComboBox::TComboBox(bool sort)
-{
-	onChange = nullptr;
-	itemIndexProperty = -1;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("COMBOBOX"));
-
-	widthProperty = 100;
-	heightProperty = 100;
-
-	leftProperty = 0;
-	heightProperty = 0;
-
-	styleProperty |= WS_VSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP;
-
-	if(sort)
-		styleProperty |= CBS_SORT;
-
-	extendedStyleProperty = WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE;
-
-	stringList = new TPointerList<TString*>(COMBOBOX_INITIAL_ITEM_ALLOCATION);
-}
-
-void TComboBox::add(const TString& text)
-{
-	TString *str = new TString(text);
-	stringList->addPointer(str);
-
-	if(handleProperty)
-		::SendMessageW(handleProperty, CB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*str);
-}
-
-void TComboBox::remove(int index)
-{
-	TString *text = stringList->getPointer(index);
-	if (text)
-		delete text;
-
-	stringList->removePointer(index);
-
-	if(handleProperty)
-		::SendMessageW(handleProperty, CB_DELETESTRING, index, 0);
-}
-
-void TComboBox::removeByText(const TString& text)
-{
-	const int itemIndex = this->getItemIndexByText(text);
-	if(itemIndex > -1)
-		this->remove(itemIndex);
-}
-
-int TComboBox::getItemIndexByText(const TString& text)
-{
-	const int listSize = stringList->getSize();
-	if(listSize)
-	{
-		for(int i = 0; i < listSize; i++)
-		{
-			if(stringList->getPointer(i)->compare(text))
-				return i;
-		}
-	}
-	return -1;
-}
-
-TString TComboBox::getItemTextByIndex(int index)
-{
-	TString *str = stringList->getPointer(index);
-
-	if(str)
-		return *str;
-
-	return TString();
-}
-
-int TComboBox::getItemCount()
-{
-	return stringList->getSize();
-}
-
-int TComboBox::getSelectedItemIndex()
-{
-	return itemIndexProperty;
-}
-
-TString TComboBox::getSelectedItem()
-{
-	const int itemIndex = this->getSelectedItemIndex();
-	if(itemIndex > -1)
-		return *stringList->getPointer(itemIndex);
-	return TString();
-}
-
-void TComboBox::clear()
-{
-	stringList->deleteAll(true);
-	if(handleProperty)
-		::SendMessageW(handleProperty, CB_RESETCONTENT, 0, 0);
-}
-
-void TComboBox::selectItem(int index)
-{
-	itemIndexProperty = index;
-	if(handleProperty)
-		::SendMessageW(handleProperty, CB_SETCURSEL, index, 0);
-}
-
-bool TComboBox::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == CBN_SELENDOK))
-	{
-		// update index property
-		itemIndexProperty = (int)::SendMessageW(handleProperty, CB_GETCURSEL, 0, 0);
-
-		if (onChange)
-			onChange(this);
-
-		result = 0;
-		return true;
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TComboBox::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-
-		const int listSize = stringList->getSize();
-		if (listSize)
-		{
-			for (int i = 0; i < listSize; i++)
-				::SendMessageW(handleProperty, CB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*stringList->getPointer(i));
-		}
-
-		if (itemIndexProperty > -1)
-			::SendMessageW(handleProperty, CB_SETCURSEL, itemIndexProperty, 0);
-
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-TComboBox::~TComboBox()
-{
-	stringList->deleteAll(false);
-	delete stringList;
-}
-
-
-
 // =========== TComponent.cpp ===========
 
 /*
@@ -1417,19 +1043,19 @@ UINT TComponent::getControlID()
 	return controlID;
 }
 
-void TComponent::setCursor(HCURSOR cursorHandle)
+void TComponent::setCursorImpl(HCURSOR cursorHandle)
 {
 	cursorProperty = cursorHandle;
 	if(handleProperty)
 		::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
 }
 
-HCURSOR TComponent::getCursor()
+HCURSOR TComponent::getCursorImpl()
 {
 	return cursorProperty;
 }
 
-TString TComponent::getClassName()
+TString TComponent::getClassNameImpl()
 {
 	return classNameProperty;
 }
@@ -1555,24 +1181,24 @@ LRESULT TComponent::dispatchToDefaultProc(TMessage& message)
 	return ::DefWindowProcW(message.hwnd, message.msg, message.wParam, message.lParam); // custom control or window
 }
 
-void TComponent::setFont(HFONT fontHandle)
+void TComponent::setFontImpl(HFONT fontHandle)
 {
 	fontProperty = fontHandle;
 	if(handleProperty)
 		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0));
 }
 
-HFONT TComponent::getFont()
+HFONT TComponent::getFontImpl()
 {
 	return fontProperty;
 }
 
-TString TComponent::getText()
+TString TComponent::getTextImpl()
 {
 	return textProperty;
 }
 
-void TComponent::setText(const TString& caption)
+void TComponent::setTextImpl(const TString& caption)
 {
 	textProperty = caption;
 	if(handleProperty)
@@ -1584,73 +1210,73 @@ void TComponent::setHandle(HWND hwnd)
 	handleProperty = hwnd;
 }
 
-HWND TComponent::getHandle()
+HWND TComponent::getHandleImpl()
 {
 	return handleProperty;
 }
 
-void TComponent::setParent(HWND parentHandle)
+void TComponent::setParentImpl(HWND parentHandle)
 {
 	parentProperty = parentHandle;
 	if(handleProperty)
 		::SetParent(handleProperty, parentProperty);
 }
 
-HWND TComponent::getParent()
+HWND TComponent::getParentImpl()
 {
 	return parentProperty;
 }
 
-DWORD TComponent::getStyle()
+DWORD TComponent::getStyleImpl()
 {
 	return styleProperty;
 }
 
-void TComponent::setStyle(DWORD compStyle)
+void TComponent::setStyleImpl(DWORD compStyle)
 {
 	styleProperty = compStyle;
 	if(handleProperty)
 		::SetWindowLongPtrW(handleProperty, GWL_STYLE, styleProperty);
 }
 
-DWORD TComponent::getExtendedStyle()
+DWORD TComponent::getExtendedStyleImpl()
 {
 	return extendedStyleProperty;
 }
 
-void TComponent::setExtendedStyle(DWORD compExStyle)
+void TComponent::setExtendedStyleImpl(DWORD compExStyle)
 {
 	extendedStyleProperty = compExStyle;
 	if(handleProperty)
 		::SetWindowLongPtrW(handleProperty, GWL_EXSTYLE, extendedStyleProperty);
 }
 
-int TComponent::getLeft()
+int TComponent::getLeftImpl()
 {
 	return leftProperty; 
 }
 
-int TComponent::getTop()
+int TComponent::getTopImpl()
 {
 	return topProperty;
 }
 
-int TComponent::getWidth()
+int TComponent::getWidthImpl()
 {
 	return widthProperty;
 }
 
-int TComponent::getHeight()
+int TComponent::getHeightImpl()
 {
 	return heightProperty;
 }
 
-void TComponent::setLeft(int compLeft)
+void TComponent::setLeftImpl(int compLeft)
 {
 	this->setPosition(compLeft, topProperty);
 }
 
-void TComponent::setTop(int compTop)
+void TComponent::setTopImpl(int compTop)
 {
 	this->setPosition(leftProperty, compTop);
 }
@@ -1664,12 +1290,12 @@ void TComponent::setPosition(int compLeft, int compTop)
 		::SetWindowPos(handleProperty, 0, leftProperty, topProperty, 0, 0, SWP_NOSIZE | SWP_NOREPOSITION | SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-void TComponent::setWidth(int compWidth)
+void TComponent::setWidthImpl(int compWidth)
 {
 	this->setSize(compWidth, heightProperty);
 }
 
-void TComponent::setHeight(int compHeight)
+void TComponent::setHeightImpl(int compHeight)
 {
 	this->setSize(widthProperty, compHeight);
 }
@@ -1683,14 +1309,14 @@ void TComponent::setSize(int compWidth, int compHeight)
 		::SetWindowPos(handleProperty, 0, 0, 0, widthProperty, heightProperty, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-void TComponent::setVisible(bool state)
+void TComponent::setVisibleImpl(bool state)
 {
 	visibleProperty = state;
 	if(handleProperty)
 		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
 }
 
-bool TComponent::getVisible()
+bool TComponent::getVisibleImpl()
 {
 	if (handleProperty)
 		visibleProperty = (::IsWindowVisible(handleProperty) == TRUE);
@@ -1708,7 +1334,7 @@ void TComponent::hide()
 	this->setVisible(false);
 }
 
-bool TComponent::getEnabled()
+bool TComponent::getEnabledImpl()
 {
 	if (handleProperty)
 		enabledProperty = (::IsWindowEnabled(handleProperty) == TRUE);
@@ -1716,7 +1342,7 @@ bool TComponent::getEnabled()
 	return enabledProperty;
 }
 
-void TComponent::setEnabled(bool state)
+void TComponent::setEnabledImpl(bool state)
 {
 	enabledProperty = state;
 
@@ -1751,10 +1377,10 @@ TComponent::~TComponent()
 		::UnregisterClassW(classNameProperty, TApplication::hInstance);
 }
 
-// =========== TEditBox.cpp ===========
+// =========== TWinButton.cpp ===========
 
 /*
-	MCL - TEditBox.cpp
+	MCL - TWinButton.cpp
 	Copyright (C) 2019 CrownSoft
   
 	This software is provided 'as-is', without any express or implied
@@ -1776,509 +1402,37 @@ TComponent::~TComponent()
 */
 
 
-TEditBox::TEditBox()
+TWinButton::TWinButton()
 {
-	classNameProperty.assignStaticText(TXT_WITH_LEN("EDIT"));
+	onPress = nullptr;
 
-	widthProperty = 100;
-	heightProperty = 20;
-
-	leftProperty = 0;
-	topProperty = 0;
-
-	readOnlyProperty = false;
-	onChange = nullptr;
-
-	styleProperty |= WS_TABSTOP | ES_AUTOHSCROLL;
-	extendedStyleProperty = WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE;
-}
-
-bool TEditBox::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == EN_CHANGE))
-	{
-		if (onChange)
-			onChange(this);
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TEditBox::isReadOnly()
-{
-	return readOnlyProperty;
-}
-
-void TEditBox::setReadOnly(bool readOnly_)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	readOnlyProperty = readOnly_;
-
-	if (readOnlyProperty)
-		this->setStyle(styleProperty | ES_READONLY);
-	else
-		this->setStyle(styleProperty & ~ES_READONLY);
-
-	if (destroyed)
-		this->create();
-}
-
-void TEditBox::setLowercaseOnly(bool lowercaseOnly_)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	if (styleProperty & ES_UPPERCASE) // remove upper case style if already set
-		styleProperty &= ~ES_UPPERCASE;
-
-	if (lowercaseOnly_)
-		this->setStyle(styleProperty | ES_LOWERCASE);
-	else
-		this->setStyle(styleProperty & ~ES_LOWERCASE);
-
-	if (destroyed)
-		this->create();
-}
-
-void TEditBox::setUppercaseOnly(bool uppercaseOnly_)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	if (styleProperty & ES_LOWERCASE) // remove lower case style if already set
-		styleProperty &= ~ES_LOWERCASE;
-
-	if (uppercaseOnly_)
-		this->setStyle(styleProperty | ES_UPPERCASE);
-	else
-		this->setStyle(styleProperty & ~ES_UPPERCASE);
-
-	if (destroyed)
-		this->create();
-}
-
-TString TEditBox::getText()
-{
-	if(handleProperty)
-	{
-		const int length = ::GetWindowTextLengthW(handleProperty);
-		if(length)
-		{
-			const int size = (length + 1) * sizeof(wchar_t);
-			wchar_t* text = (wchar_t*)::malloc(size);
-			text[0] = 0;
-			::GetWindowTextW(handleProperty, text, size);
-			textProperty = TString(text, TString::FREE_TEXT_WHEN_DONE);
-		}else
-		{
-			textProperty = TString();
-		}
-	}
-	return textProperty;
-}
-
-bool TEditBox::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-TEditBox::~TEditBox()
-{
-}
-
-// =========== TGlyphButton.cpp ===========
-
-/*
-	MCL - TGlyphButton.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-#include <windows.h>
-
-TGlyphButton::TGlyphButton()
-{
-	glyphFont = 0;
-	glyphChar = 0;
-	glyphLeft = 6;
-}
-
-TGlyphButton::~TGlyphButton()
-{
-}
-
-void TGlyphButton::setGlyph(const wchar_t *glyphChar, HFONT glyphFont, COLORREF glyphColor, int glyphLeft)
-{
-	this->glyphChar = glyphChar;
-	this->glyphFont = glyphFont;
-	this->glyphColor = glyphColor;
-	this->glyphLeft = glyphLeft;
-
-	this->repaint();
-}
-
-bool TGlyphButton::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if (glyphFont)
-	{
-		if (message.msg == WM_NOTIFY)
-		{
-			if (((LPNMHDR)message.lParam)->code == NM_CUSTOMDRAW) // custom drawing msg received for this component
-			{
-				LPNMCUSTOMDRAW lpNMCD = (LPNMCUSTOMDRAW)message.lParam;
-
-				result = CDRF_DODEFAULT; // take the default processing unless we set this to something else below.
-
-				if (CDDS_PREPAINT == lpNMCD->dwDrawStage) // it's the control's prepaint stage, tell Windows we want message after paint.
-				{
-					result = CDRF_NOTIFYPOSTPAINT;
-				}
-				else if (CDDS_POSTPAINT == lpNMCD->dwDrawStage) //  postpaint stage
-				{
-					const RECT rc = lpNMCD->rc;
-					const bool bDisabled = (lpNMCD->uItemState & (CDIS_DISABLED | CDIS_GRAYED)) != 0;
-
-					HGDIOBJ oldFont = ::SelectObject(lpNMCD->hdc, glyphFont);
-					const COLORREF oldTextColor = ::SetTextColor(lpNMCD->hdc, bDisabled ? ::GetSysColor(COLOR_GRAYTEXT) : glyphColor);
-					const int oldBkMode = ::SetBkMode(lpNMCD->hdc, TRANSPARENT);
-
-					RECT rcIcon = { rc.left + glyphLeft, rc.top, rc.right, rc.bottom };
-					::DrawTextW(lpNMCD->hdc, glyphChar, 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER); // draw glyph
-
-					::SetBkMode(lpNMCD->hdc, oldBkMode);
-					::SetTextColor(lpNMCD->hdc, oldTextColor);
-					::SelectObject(lpNMCD->hdc, oldFont);
-
-					result = CDRF_DODEFAULT;
-				}
-
-				return true; // indicate that we processed this msg & result is valid.
-			}
-		}
-	}
-
-	return TButton::notifyProcHandler(message, result); // pass unprocessed messages to parent
-}
-
-// =========== TGridView.cpp ===========
-
-/*
-	MCL - TGridView.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TGridView::TGridView(bool sortItems)
-{
-	itemCount = 0;
-	colCount = 0;
-
-	onItemSelect = nullptr;
-	onItemRightClick = nullptr;
-	onItemDoubleClick = nullptr;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("SysListView32"));
-
-	widthProperty = 300;
-	heightProperty = 200;
-
-	leftProperty = 0;
-	topProperty = 0;
-
-	styleProperty |= WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL;
-	extendedStyleProperty = WS_EX_WINDOWEDGE;
-
-	if (sortItems)
-		styleProperty |= LVS_SORTASCENDING;
-}
-
-TGridView::~TGridView(){}
-
-void TGridView::insertRecord(TString **columnsData)
-{
-	LVITEMW lvi = { 0 };
-	lvi.mask = LVIF_TEXT;
-	lvi.pszText = (*columnsData[0]);
-	lvi.iItem = itemCount;
-
-	const int row = (int)::SendMessageW(handleProperty, LVM_INSERTITEMW, 0, (LPARAM)&lvi);
-
-	for (int i = 1; i < colCount; i++) // first column already added, lets add the others
-	{
-		LV_ITEMW lvItem = { 0 };
-		lvItem.iSubItem = i;
-		lvItem.pszText = (*columnsData[i]);
-
-		::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)row, (LPARAM)&lvItem);
-	}
-
-	++itemCount;
-}
-
-void TGridView::insertRecordTo(int rowIndex, TString **columnsData)
-{
-	LVITEMW lvi = { 0 };
-	lvi.mask = LVIF_TEXT;
-	lvi.pszText = (*columnsData[0]);
-	lvi.iItem = rowIndex;
-
-	const int row = (int)::SendMessageW(handleProperty, LVM_INSERTITEMW, 0, (LPARAM)&lvi);
-
-	for (int i = 1; i < colCount; i++) // first column already added, lets add the others
-	{
-		LV_ITEMW lvItem= { 0 };
-		lvItem.iSubItem = i;
-		lvItem.pszText = (*columnsData[i]);
-
-		::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)row, (LPARAM)&lvItem);
-	}
-
-	++itemCount;
-}
-
-TString TGridView::getRecordAt(int rowIndex, int columnIndex)
-{
-	wchar_t *buffer = (wchar_t*)::malloc(512 * sizeof(wchar_t));
-	buffer[0] = 0;
-
-	LV_ITEMW lvi = { 0 };
-	lvi.iSubItem = columnIndex;
-	lvi.cchTextMax = 512;
-	lvi.pszText = buffer;
-
-	::SendMessageW(handleProperty, LVM_GETITEMTEXTW, (WPARAM)rowIndex, (LPARAM)&lvi); // explicity call unicode version. we can't use ListView_GetItemText macro. it relies on preprocessor defs.
-
-	return TString(buffer, TString::FREE_TEXT_WHEN_DONE);
-}
-
-int TGridView::getSelectedRow()
-{
-	return ListView_GetNextItem(handleProperty, -1, LVNI_SELECTED);
-}
-
-void TGridView::removeRecordAt(int rowIndex)
-{
-	if (ListView_DeleteItem(handleProperty, rowIndex))
-		--itemCount;
-}
-
-void TGridView::removeAll()
-{
-	ListView_DeleteAllItems(handleProperty);
-	itemCount = 0;
-}
-
-void TGridView::updateRecordAt(int rowIndex, int columnIndex, const TString& text)
-{
-	LV_ITEMW lvi = { 0 };
-	lvi.iSubItem = columnIndex;
-	lvi.pszText = text;
-
-	::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)rowIndex, (LPARAM)&lvi); // explicity call unicode version. we can't use ListView_SetItemText macro. it relies on preprocessor defs.
-}
-
-void TGridView::setColumnWidth(int columnIndex, int columnWidth)
-{
-	ListView_SetColumnWidth(handleProperty, columnIndex, columnWidth);
-}
-
-int TGridView::getColumnWidth(int columnIndex)
-{
-	return ListView_GetColumnWidth(handleProperty, columnIndex);
-}
-
-void TGridView::createColumn(const TString& text, int columnWidth)
-{
-	LVCOLUMN lvc = { 0 };
-
-	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-	lvc.fmt = LVCFMT_LEFT;
-	lvc.cx = columnWidth;
-	lvc.pszText = text;
-	lvc.iSubItem = colCount;
-
-	::SendMessageW(handleProperty, LVM_INSERTCOLUMNW, (WPARAM)colCount, (LPARAM)&lvc);
-
-	++colCount;
-}
-
-bool TGridView::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if (message.msg == WM_NOTIFY)
-	{
-		if (((LPNMHDR)message.lParam)->code == LVN_ITEMCHANGED) // List view item selection changed (mouse or keyboard)
-		{
-			LPNMLISTVIEW pNMListView = (LPNMLISTVIEW)message.lParam;
-			if ((pNMListView->uChanged & LVIF_STATE) && (pNMListView->uNewState & LVIS_SELECTED))
-			{
-				if (onItemSelect)
-					onItemSelect(this, this->getSelectedRow());
-
-				result = 0;
-				return true;
-			}
-		}
-		else if (((LPNMHDR)message.lParam)->code == NM_RCLICK) // List view item right click
-		{
-			if(onItemRightClick)
-				onItemRightClick(this, this->getSelectedRow());
-
-			result = 0;
-			return true;
-		}
-		else if (((LPNMHDR)message.lParam)->code == NM_DBLCLK) // List view item double click
-		{
-			if(onItemDoubleClick)
-				onItemDoubleClick(this, this->getSelectedRow());
-
-			result = 0;
-			return true;
-		}
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TGridView::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		ListView_SetExtendedListViewStyle(handleProperty, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-
-
-// =========== TGroupBox.cpp ===========
-
-/*
-	MCL - TGroupBox.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TGroupBox::TGroupBox()
-{
 	classNameProperty.assignStaticText(TXT_WITH_LEN("BUTTON"));
-	textProperty.assignStaticText(TXT_WITH_LEN("GroupBox"));
+	textProperty.assignStaticText(TXT_WITH_LEN("Button"));
 
 	widthProperty = 100;
-	heightProperty = 100;
+	heightProperty = 30;
 
-	leftProperty = 0;
-	topProperty = 0;
-
-	styleProperty |= BS_GROUPBOX;
+	styleProperty |= BS_NOTIFY | WS_TABSTOP;
 	extendedStyleProperty = WS_EX_WINDOWEDGE;
 }
 
-bool TGroupBox::create()
+bool TWinButton::notifyProcHandler(TMessage& message, LRESULT& result)
 {
-	if (!parentProperty) // user must specify parent handle!
+	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
+	{
+		if (onPress)
+			onPress(this);
+
+		result = 0;
+		return true;
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinButton::create()
+{
+	if(!parentProperty) // user must specify parent handle!
 		return false;
 
 	isRegistered = false; // we don't want to unregister this class.
@@ -2299,14 +1453,14 @@ bool TGroupBox::create()
 	return false;
 }
 
-TGroupBox::~TGroupBox()
+TWinButton::~TWinButton()
 {
 }
 
-// =========== TLabel.cpp ===========
+// =========== TWinCheckBox.cpp ===========
 
 /*
-	MCL - TLabel.cpp
+	MCL - TWinCheckBox.cpp
 	Copyright (C) 2019 CrownSoft
   
 	This software is provided 'as-is', without any express or implied
@@ -2328,22 +1482,21 @@ TGroupBox::~TGroupBox()
 */
 
 
-TLabel::TLabel()
+TWinCheckBox::TWinCheckBox()
 {
-	classNameProperty.assignStaticText(TXT_WITH_LEN("STATIC"));
-	textProperty.assignStaticText(TXT_WITH_LEN("Label"));
+	valueProperty = false;
+	onCheck = nullptr;
 
 	widthProperty = 100;
 	heightProperty = 25;
 
-	leftProperty = 0;
-	topProperty = 0;
+	classNameProperty.assignStaticText(TXT_WITH_LEN("BUTTON"));
+	textProperty.assignStaticText(TXT_WITH_LEN("CheckBox"));
 
-	styleProperty |= BS_NOTIFY;
-	extendedStyleProperty = WS_EX_WINDOWEDGE;
+	styleProperty |= BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP;
 }
 
-bool TLabel::create()
+bool TWinCheckBox::create()
 {
 	if (!parentProperty) // user must specify parent handle!
 		return false;
@@ -2355,6 +1508,7 @@ bool TLabel::create()
 	if (handleProperty)
 	{
 		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::SendMessageW(handleProperty, BM_SETCHECK, valueProperty ? BST_CHECKED : BST_UNCHECKED, 0);
 		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
 		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
 
@@ -2366,14 +1520,48 @@ bool TLabel::create()
 	return false;
 }
 
-TLabel::~TLabel()
+bool TWinCheckBox::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
+	{
+		// update internal state
+		if (::SendMessageW(handleProperty, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			valueProperty = true;
+		else
+			valueProperty = false;
+
+		// inform to event
+		if (onCheck)
+			onCheck(this);
+
+		result = 0;
+		return true;
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinCheckBox::getValueImpl()
+{
+	return valueProperty;
+}
+
+void TWinCheckBox::setValueImpl(bool state)
+{
+	valueProperty = state;
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, BM_SETCHECK, valueProperty ? BST_CHECKED : BST_UNCHECKED, 0);
+}
+
+TWinCheckBox::~TWinCheckBox()
 {
 }
 
-// =========== TListBox.cpp ===========
+// =========== TWinComboBox.cpp ===========
 
 /*
-	MCL - TListBox.cpp
+	MCL - TWinComboBox.cpp
 	Copyright (C) 2019 CrownSoft
   
 	This software is provided 'as-is', without any express or implied
@@ -2395,49 +1583,41 @@ TLabel::~TLabel()
 */
 
 
-#define INITIAL_LIST_ITEM_COUNT 100
+#define COMBOBOX_INITIAL_ITEM_ALLOCATION 50
 
-TListBox::TListBox(bool multipleSelection, bool sort, bool vscroll)
+TWinComboBox::TWinComboBox(bool sort)
 {
-	this->multipleSelection = multipleSelection;
+	onChange = nullptr;
+	itemIndexProperty = -1;
 
-	onItemSelect = nullptr;
-	onItemDoubleClick = nullptr;
-
-	selectedItemIndex = -1;
-	selectedItemEnd = -1;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("LISTBOX"));
+	classNameProperty.assignStaticText(TXT_WITH_LEN("COMBOBOX"));
 
 	widthProperty = 100;
 	heightProperty = 100;
 
 	leftProperty = 0;
-	topProperty = 0;
+	heightProperty = 0;
 
-	styleProperty |= LBS_NOTIFY | WS_TABSTOP;
+	styleProperty |= WS_VSCROLL | CBS_DROPDOWNLIST | WS_TABSTOP;
+
+	if(sort)
+		styleProperty |= CBS_SORT;
+
 	extendedStyleProperty = WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE;
 
-	if(multipleSelection)
-		styleProperty |= LBS_MULTIPLESEL;
-	if(sort)
-		styleProperty |= LBS_SORT;
-	if(vscroll)
-		styleProperty |= WS_VSCROLL;
-
-	stringList = new TPointerList<TString*>(INITIAL_LIST_ITEM_COUNT);
+	stringList = new TPointerList<TString*>(COMBOBOX_INITIAL_ITEM_ALLOCATION);
 }
 
-void TListBox::addItem(const TString& text)
+void TWinComboBox::add(const TString& text)
 {
 	TString *str = new TString(text);
 	stringList->addPointer(str);
 
 	if(handleProperty)
-		::SendMessageW(handleProperty, LB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*str);
+		::SendMessageW(handleProperty, CB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*str);
 }
 
-void TListBox::removeItem(int index)
+void TWinComboBox::remove(int index)
 {
 	TString *text = stringList->getPointer(index);
 	if (text)
@@ -2446,47 +1626,51 @@ void TListBox::removeItem(int index)
 	stringList->removePointer(index);
 
 	if(handleProperty)
-		::SendMessageW(handleProperty, LB_DELETESTRING, index, 0);
+		::SendMessageW(handleProperty, CB_DELETESTRING, index, 0);
 }
 
-void TListBox::removeItem(const TString& text)
+void TWinComboBox::removeByText(const TString& text)
 {
-	const int itemIndex = this->getItemIndex(text);
+	const int itemIndex = this->getItemIndexByText(text);
 	if(itemIndex > -1)
-		this->removeItem(itemIndex);
+		this->remove(itemIndex);
 }
 
-int TListBox::getItemIndex(const TString& text)
+int TWinComboBox::getItemIndexByText(const TString& text)
 {
 	const int listSize = stringList->getSize();
 	if(listSize)
 	{
 		for(int i = 0; i < listSize; i++)
 		{
-			if (stringList->getPointer(i)->compare(text))
+			if(stringList->getPointer(i)->compare(text))
 				return i;
 		}
 	}
 	return -1;
 }
 
-int TListBox::getItemCount()
+TString TWinComboBox::getItemTextByIndex(int index)
+{
+	TString *str = stringList->getPointer(index);
+
+	if(str)
+		return *str;
+
+	return TString();
+}
+
+int TWinComboBox::getItemCountImpl()
 {
 	return stringList->getSize();
 }
 
-int TListBox::getSelectedItemIndex()
+int TWinComboBox::getSelectedItemIndexImpl()
 {
-	if(handleProperty)
-	{	 
-		const int index = (int)::SendMessageW(handleProperty, LB_GETCURSEL, 0, 0);
-		if(index != LB_ERR)
-			return index;
-	}
-	return -1;	
+	return itemIndexProperty;
 }
 
-TString TListBox::getSelectedItem()
+TString TWinComboBox::getSelectedItem()
 {
 	const int itemIndex = this->getSelectedItemIndex();
 	if(itemIndex > -1)
@@ -2494,71 +1678,38 @@ TString TListBox::getSelectedItem()
 	return TString();
 }
 
-int TListBox::getSelectedItems(int* itemArray, int itemCountInArray)
-{
-	if(handleProperty)
-	{	 
-		const int items = (int)::SendMessageW(handleProperty, LB_GETSELITEMS, itemCountInArray, (LPARAM)itemArray);
-		if(items != LB_ERR)
-			return items;
-	}
-	return -1;
-}
-
-void TListBox::clearList()
+void TWinComboBox::clear()
 {
 	stringList->deleteAll(true);
-
 	if(handleProperty)
-		::SendMessageW(handleProperty, LB_RESETCONTENT, 0, 0);
+		::SendMessageW(handleProperty, CB_RESETCONTENT, 0, 0);
 }
 
-void TListBox::selectItem(int index)
+void TWinComboBox::selectItemImpl(int index)
 {
-	selectedItemIndex = index;
-
+	itemIndexProperty = index;
 	if(handleProperty)
-		::SendMessageW(handleProperty, LB_SETCURSEL, index, 0);
+		::SendMessageW(handleProperty, CB_SETCURSEL, index, 0);
 }
 
-void TListBox::selectItems(int start, int end)
+bool TWinComboBox::notifyProcHandler(TMessage& message, LRESULT& result)
 {
-	if(multipleSelection)
+	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == CBN_SELENDOK))
 	{
-		selectedItemIndex = start;
-		selectedItemEnd = end;
+		// update index property
+		itemIndexProperty = (int)::SendMessageW(handleProperty, CB_GETCURSEL, 0, 0);
 
-		if(handleProperty)
-			::SendMessageW(handleProperty, LB_SELITEMRANGE, TRUE, MAKELPARAM(start, end));
-	}
-}
+		if (onChange)
+			onChange(this);
 
-bool TListBox::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if (message.msg == WM_COMMAND)
-	{
-		if (HIWORD(message.wParam) == LBN_SELCHANGE) // listbox sel change!
-		{
-			if (onItemSelect)
-				onItemSelect(this, this->getSelectedItemIndex());
-
-			result = 0;
-			return true;
-		}
-		else if (HIWORD(message.wParam) == LBN_DBLCLK) // listbox double click
-		{
-			if(onItemDoubleClick)
-				onItemDoubleClick(this, this->getSelectedItemIndex());
-
-			result = 0;
-			return true;
-		}
+		result = 0;
+		return true;
 	}
 
 	return TControl::notifyProcHandler(message, result);
 }
 
-bool TListBox::create()
+bool TWinComboBox::create()
 {
 	if (!parentProperty) // user must specify parent handle!
 		return false;
@@ -2576,19 +1727,11 @@ bool TListBox::create()
 		if (listSize)
 		{
 			for (int i = 0; i < listSize; i++)
-				::SendMessageW(handleProperty, LB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*stringList->getPointer(i));
+				::SendMessageW(handleProperty, CB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*stringList->getPointer(i));
 		}
 
-		if (!multipleSelection) // single selction!
-		{
-			if (selectedItemIndex > -1)
-				::SendMessageW(handleProperty, LB_SETCURSEL, selectedItemIndex, 0);
-		}
-		else
-		{
-			if (selectedItemIndex > -1)
-				::SendMessageW(handleProperty, LB_SELITEMRANGE, TRUE, MAKELPARAM(selectedItemIndex, selectedItemEnd));
-		}
+		if (itemIndexProperty > -1)
+			::SendMessageW(handleProperty, CB_SETCURSEL, itemIndexProperty, 0);
 
 		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
 
@@ -2600,986 +1743,12 @@ bool TListBox::create()
 	return false;
 }
 
-
-TListBox::~TListBox()
+TWinComboBox::~TWinComboBox()
 {
 	stringList->deleteAll(false);
 	delete stringList;
 }
 
-// =========== TMenu.cpp ===========
-
-/*
-	MCL - TMenu.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-
-TMenu::TMenu()
-{
-	hMenu = ::CreatePopupMenu();
-}
-
-void TMenu::add(TMenuItem& menuItem)
-{
-	menuItem.addToMenu(hMenu);
-}
-
-void TMenu::addSubMenu(const TString& text, const TMenu& menu)
-{
-	::InsertMenuW(hMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(HMENU)menu, text);
-}
-
-void TMenu::addSeperator()
-{
-	MENUITEMINFOW mii;
-	::ZeroMemory(&mii, sizeof(mii));
-
-	mii.cbSize = sizeof(MENUITEMINFOW);
-	mii.fMask = MIIM_TYPE;
-	mii.fType = MFT_SEPARATOR;
-
-	::InsertMenuItemW(hMenu, 0xFFFFFFFF, FALSE, &mii);
-}
-
-HMENU TMenu::getMenuHandle()
-{
-	return hMenu;
-}
-
-TMenu::operator HMENU()const
-{
-	return hMenu;
-}
-
-void TMenu::popUpMenu(TWindow& window)
-{
-	if(window)
-	{
-		POINT p;
-		::GetCursorPos(&p);
-		::TrackPopupMenu(hMenu, TPM_LEFTBUTTON, p.x, p.y, 0, window, NULL);
-	}
-}
-
-TMenu::~TMenu()
-{
-	::DestroyMenu(hMenu);
-}
-
-// =========== TMenuBar.cpp ===========
-
-/*
-	MCL - TMenuBar.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TMenuBar::TMenuBar()
-{
-	hMenu = ::CreateMenu();
-}
-
-void TMenuBar::add(const TString& text, const TMenu& menu)
-{
-	::InsertMenuW(hMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(HMENU)menu, text);
-}
-
-HMENU TMenuBar::getHandle()
-{
-	return hMenu;
-}
-
-TMenuBar::operator HMENU()const
-{
-	return hMenu;
-}
-
-TMenuBar::~TMenuBar()
-{
-	::DestroyMenu(hMenu);
-}
-
-// =========== TMenuButton.cpp ===========
-
-/*
-	MCL - TMenuButton.cpp
-	Copyright (C) 2019 CrownSoft
-
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-
-*/
-
-
-TMenuButton::TMenuButton()
-{
-	buttonMenu = 0;
-	glyphFont = 0;
-	glyphChar = 0;
-	glyphLeft = 6;
-	arrowFont = new TFont(CONST_TXT("Webdings"), 18);
-}	
-
-TMenuButton::~TMenuButton()
-{
-	delete arrowFont;
-}
-
-void TMenuButton::setMenu(TMenu& buttonMenu_)
-{
-	buttonMenu = &buttonMenu_;
-}
-
-void TMenuButton::setGlyph(const wchar_t *glyphChar, HFONT glyphFont, COLORREF glyphColor, int glyphLeft)
-{
-	this->glyphChar = glyphChar;
-	this->glyphFont = glyphFont;
-	this->glyphColor = glyphColor;
-	this->glyphLeft = glyphLeft;
-
-	this->repaint();
-}
-
-bool TMenuButton::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if (message.msg == WM_NOTIFY)
-	{		
-		if (((LPNMHDR)message.lParam)->code == NM_CUSTOMDRAW) // custom drawing msg received for this component
-		{
-			LPNMCUSTOMDRAW lpNMCD = (LPNMCUSTOMDRAW)message.lParam;
-
-			result = CDRF_DODEFAULT; // take the default processing unless we set this to something else below.
-
-			if (CDDS_PREPAINT == lpNMCD->dwDrawStage) // it's the control's prepaint stage, tell Windows we want message after paint.
-			{
-				result = CDRF_NOTIFYPOSTPAINT;
-			}
-			else if ( CDDS_POSTPAINT== lpNMCD->dwDrawStage ) //  postpaint stage
-			{
-				const RECT rc = lpNMCD->rc;
-				TGraphics::draw3dVLine(lpNMCD->hdc, rc.right - 22, rc.top + 6, rc.bottom - 12); // draw line
-
-				const bool bDisabled = (lpNMCD->uItemState & (CDIS_DISABLED|CDIS_GRAYED)) != 0;
-
-				HGDIOBJ oldFont = ::SelectObject(lpNMCD->hdc, arrowFont->getFontHandle());
-				const COLORREF oldTextColor = ::SetTextColor(lpNMCD->hdc, ::GetSysColor(bDisabled ? COLOR_GRAYTEXT : COLOR_BTNTEXT));
-				const int oldBkMode = ::SetBkMode(lpNMCD->hdc, TRANSPARENT);
-
-				RECT rcIcon = { rc.right - 18, rc.top, rc.right, rc.bottom };
-				::DrawTextW(lpNMCD->hdc, L"\x36", 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER); // draw arrow
-
-				if (glyphFont) // draw glyph
-				{
-					::SelectObject(lpNMCD->hdc, glyphFont);
-					::SetTextColor(lpNMCD->hdc, bDisabled ? ::GetSysColor(COLOR_GRAYTEXT) : glyphColor);
-
-					rcIcon = { rc.left + glyphLeft, rc.top, rc.right, rc.bottom };
-					::DrawTextW(lpNMCD->hdc, glyphChar, 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER);
-				}
-
-				::SetBkMode(lpNMCD->hdc, oldBkMode);
-				::SetTextColor(lpNMCD->hdc, oldTextColor);
-				::SelectObject(lpNMCD->hdc, oldFont);
-
-				result = CDRF_DODEFAULT;
-			}
-
-			return true; // indicate that we processed this msg & result is valid.
-		}
-	}
-	else if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
-	{
-		if (buttonMenu)
-		{
-			POINT point = { leftProperty, topProperty };
-			::ClientToScreen(parentProperty, &point); // get screen cordinates
-
-			::TrackPopupMenu(buttonMenu->getMenuHandle(), TPM_LEFTBUTTON, point.x, point.y + heightProperty, 0, parentProperty, NULL);
-		}
-
-		if (onPress)
-			onPress(this);
-
-		result = 0;
-		return true;
-	}
-
-	return TButton::notifyProcHandler(message, result); // pass unprocessed messages to parent
-}
-
-// =========== TMenuItem.cpp ===========
-
-/*
-	MCL - TMenuItem.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TMenuItem::TMenuItem()
-{
-	MCL_INIT_VERIFIER;
-	hMenu = 0;
-	onPress = nullptr;
-	enabled = true;
-	checked = false;
-	itemID = TPlatformUtil::getInstance()->generateMenuItemID(this);
-}
-
-void TMenuItem::addToMenu(HMENU hMenu)
-{
-	this->hMenu = hMenu;
-
-	MENUITEMINFOW mii;
-	::ZeroMemory(&mii, sizeof(mii));
-
-	mii.cbSize = sizeof(MENUITEMINFOW);
-	mii.fMask = MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE;
-	mii.fType = MFT_STRING;
-	mii.dwTypeData = (LPWSTR)(const wchar_t*)textProperty;
-	mii.cch = lstrlenW((LPWSTR)(const wchar_t*)textProperty);
-	mii.fState = (enabled ? MFS_ENABLED : MFS_DISABLED) | (checked ? MFS_CHECKED : MFS_UNCHECKED);
-	mii.wID = itemID;
-	mii.dwItemData = (ULONG_PTR)this; // for future!
-
-	::InsertMenuItemW(hMenu, itemID, FALSE, &mii);
-}
-
-bool TMenuItem::isChecked()
-{
-	return checked;
-}
-
-void TMenuItem::setCheckedState(bool state)
-{
-	checked = state;
-	if(hMenu) // it's alredy created menu item!
-	{
-		MENUITEMINFOW mii;
-		::ZeroMemory(&mii, sizeof(mii));
-
-		mii.cbSize = sizeof(MENUITEMINFOW);
-		mii.fMask = MIIM_STATE;
-		mii.fState = checked ? MFS_CHECKED : MFS_UNCHECKED;
-
-		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
-	}
-}
-
-bool TMenuItem::isEnabled()
-{
-	return enabled; 
-}
-
-void TMenuItem::setEnabled(bool state)
-{
-	enabled = state;
-	if(hMenu) // it's alredy created menu item!
-	{
-		MENUITEMINFOW mii;
-		::ZeroMemory(&mii, sizeof(mii));
-
-		mii.cbSize = sizeof(MENUITEMINFOW);
-		mii.fMask = MIIM_STATE;
-		mii.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
-
-		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
-	}
-}
-
-void TMenuItem::setText(const TString& text)
-{
-	textProperty = text;
-	if(hMenu) // it's alredy created menu item!
-	{
-		MENUITEMINFOW mii;
-		::ZeroMemory(&mii, sizeof(mii));
-
-		mii.cbSize = sizeof(MENUITEMINFOW);
-		mii.fMask = MIIM_TYPE;
-		mii.fType = MFT_STRING;
-		mii.dwTypeData = (LPWSTR)(const wchar_t*)textProperty;
-		mii.cch = lstrlenW((LPWSTR)(const wchar_t*)textProperty);
-
-		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
-	}
-}
-
-TString TMenuItem::getText()
-{
-	return textProperty;
-}
-
-UINT TMenuItem::getItemID()
-{
-	return itemID;
-}
-
-HMENU TMenuItem::getMenuHandle()
-{
-	return hMenu;
-}
-
-TMenuItem::~TMenuItem()
-{
-}
-
-
-// =========== TNumericField.cpp ===========
-
-/*
-	MCL - TNumericField.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TNumericField::TNumericField()
-{
-	styleProperty |= ES_NUMBER;
-}
-
-TNumericField::~TNumericField(){}
-
-// =========== TPasswordBox.cpp ===========
-
-/*
-	MCL - TPasswordBox.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TPasswordBox::TPasswordBox()
-{
-	passwordCharProperty = '*';
-	styleProperty |= ES_PASSWORD;
-}
-
-void TPasswordBox::setPasswordChar(const char pwdChar)
-{
-	this->passwordCharProperty = pwdChar;
-	if(handleProperty)
-	{
-		::SendMessageW(handleProperty, EM_SETPASSWORDCHAR, passwordCharProperty, 0);
-		this->repaint();
-	}
-}
-
-char TPasswordBox::getPasswordChar()
-{
-	return passwordCharProperty;
-}
-
-bool TPasswordBox::create()
-{
-	if(TEditBox::create())
-	{
-		::SendMessageW(handleProperty, EM_SETPASSWORDCHAR, passwordCharProperty, 0);
-		return true;
-	}
-	return false;
-}
-
-TPasswordBox::~TPasswordBox()
-{
-}
-
-// =========== TProgressBar.cpp ===========
-
-/*
-	MCL - TProgressBar.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TProgressBar::TProgressBar()
-{
-	progress = 0;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("msctls_progress32"));
-
-	widthProperty = 100;
-	heightProperty = 20;
-
-	leftProperty = 0;
-	topProperty = 0;
-
-	extendedStyleProperty = WS_EX_WINDOWEDGE;
-	styleProperty |= PBS_SMOOTH;
-}
-
-void TProgressBar::setEnableSmooth(bool smooth_)
-{
-	if (smooth_)
-		this->setStyle(styleProperty | PBS_SMOOTH);
-	else
-		this->setStyle(styleProperty & ~PBS_SMOOTH);
-}
-
-void TProgressBar::setOrientation(bool vertical_)
-{
-	if (vertical_)
-		this->setStyle(styleProperty | PBS_VERTICAL);
-	else
-		this->setStyle(styleProperty & ~PBS_VERTICAL);
-}
-
-int TProgressBar::getValue()
-{
-	return progress;
-}
-
-void TProgressBar::setValue(int val)
-{
-	this->progress = val;
-
-	if(handleProperty)
-		::SendMessageW(handleProperty, PBM_SETPOS, progress, 0);
-}
-
-bool TProgressBar::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, PBM_SETRANGE, 0, MAKELPARAM(0, 100)); // set range between 0-100
-		::SendMessageW(handleProperty, PBM_SETPOS, value, 0); // set current value!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-TProgressBar::~TProgressBar()
-{
-}
-
-// =========== TPushButton.cpp ===========
-
-/*
-	MCL - TPushButton.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TPushButton::TPushButton()
-{
-	classNameProperty.assignStaticText(TXT_WITH_LEN("Push Button"));
-	styleProperty |= BS_PUSHLIKE;
-}
-
-TPushButton::~TPushButton()
-{
-}
-
-// =========== TRadioButton.cpp ===========
-
-/*
-	MCL - TRadioButton.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TRadioButton::TRadioButton()
-{
-	textProperty.assignStaticText(TXT_WITH_LEN("RadioButton"));
-
-	styleProperty &= ~BS_AUTOCHECKBOX; // remove inherited checkbox style
-	styleProperty |= BS_RADIOBUTTON;
-
-}
-
-TRadioButton::~TRadioButton()
-{
-}
-
-// =========== TSlider.cpp ===========
-
-/*
-	MCL - TSlider.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-
-TSlider::TSlider()
-{
-	rangeMin = 0;
-	rangeMax = 100;
-	positionProperty = 0;
-	onChange = nullptr;
-
-	widthProperty = 100;
-	heightProperty = 25;
-
-	leftProperty = 0;
-	topProperty = 0;
-
-	styleProperty |= WS_TABSTOP | TBS_NOTICKS | TBS_HORZ;
-	extendedStyleProperty = WS_EX_WINDOWEDGE;
-
-	classNameProperty.assignStaticText(TXT_WITH_LEN("msctls_trackbar32"));
-}
-
-void TSlider::setEnableTicks(bool enableTicks)
-{
-	if (enableTicks)
-		this->setStyle((styleProperty & ~TBS_NOTICKS) | TBS_AUTOTICKS);
-	else
-		this->setStyle((styleProperty & ~TBS_AUTOTICKS) | TBS_NOTICKS);
-}
-
-void TSlider::setOrientation(bool vertical)
-{
-	if (vertical)
-		this->setStyle((styleProperty & ~TBS_HORZ) | TBS_VERT);
-	else
-		this->setStyle((styleProperty & ~TBS_VERT) | TBS_HORZ);
-}
-
-void TSlider::setRange(int min, int max)
-{
-	rangeMin = min;
-	rangeMax = max;
-	if(handleProperty)
-		::SendMessageW(handleProperty, TBM_SETRANGE, TRUE, (LPARAM) MAKELONG(min, max));
-}
-
-void TSlider::setPosition(int pos)
-{
-	this->positionProperty = pos;
-	if(handleProperty)
-		::SendMessageW(handleProperty, TBM_SETPOS, TRUE, (LPARAM)positionProperty);
-}
-
-int TSlider::getPosition()
-{
-	return positionProperty;
-}
-
-bool TSlider::notifyProcHandler(TMessage& message, LRESULT& result)
-{
-	if( (message.msg == WM_HSCROLL) || (message.msg == WM_VSCROLL) )
-	{
-		const int nScrollCode = (int)LOWORD(message.wParam);
-
-		if( (TB_THUMBTRACK == nScrollCode) || (TB_LINEDOWN == nScrollCode) || (TB_LINEUP == nScrollCode) || 
-			(TB_BOTTOM == nScrollCode) || (TB_TOP == nScrollCode) || (TB_PAGEUP == nScrollCode) || 
-			(TB_PAGEDOWN == nScrollCode) || (TB_THUMBPOSITION == nScrollCode)) // its trackbar!
-		{
-			positionProperty = (int)::SendMessageW(handleProperty, TBM_GETPOS, 0, 0);
-
-			if (onChange)
-				onChange(this, positionProperty);
-			
-			result = 0;
-			return true;
-		}
-	}
-
-	return TControl::notifyProcHandler(message, result);
-}
-
-bool TSlider::create()
-{
-	if (!parentProperty) // user must specify parent handle!
-		return false;
-
-	isRegistered = false; // we don't want to unregister this class.
-
-	::CreateMCLComponent(this);
-
-	if (handleProperty)
-	{
-		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
-		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
-
-		::SendMessageW(handleProperty, TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(rangeMin, rangeMax));
-		::SendMessageW(handleProperty, TBM_SETPOS, TRUE, (LPARAM)positionProperty);
-
-		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
-
-		if (cursorProperty)
-			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
-
-		return true;
-	}
-	return false;
-}
-
-TSlider::~TSlider()
-{
-}
-
-
-// =========== TTextArea.cpp ===========
-
-/*
-	MCL - TTextArea.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TTextArea::TTextArea()
-{
-	widthProperty = 200;
-	heightProperty = 100;
-
-	styleProperty |= ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL;
-	styleProperty = styleProperty & ~ES_AUTOHSCROLL; // remove ES_AUTOHSCROLL which comes from TEditBox
-}
-
-void TTextArea::setEnableVScrollBar(bool enableVScrollBar)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	if (enableVScrollBar)
-		this->setStyle((styleProperty  & ~ES_AUTOVSCROLL) | WS_VSCROLL);
-	else
-		this->setStyle((styleProperty & ~WS_VSCROLL) | ES_AUTOVSCROLL);
-
-	if(destroyed)
-		this->create();
-}
-
-void TTextArea::setEnableHScrollBar(bool enableHScrollBar)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	if (enableHScrollBar)
-		this->setStyle((styleProperty & ~ES_AUTOHSCROLL) | WS_HSCROLL);
-	else
-		this->setStyle((styleProperty & ~WS_HSCROLL) | ES_AUTOHSCROLL);
-
-	if (destroyed)
-		this->create();
-}
-
-void TTextArea::setEnableWordWrap(bool enableWordWrap)
-{
-	bool destroyed = false;
-
-	if (handleProperty)
-	{
-		this->getText(); // this will update textProperty.
-		this->destroy();
-		destroyed = true;
-	}
-
-	if (enableWordWrap)
-		this->setStyle((styleProperty & ~ES_AUTOHSCROLL) & ~WS_HSCROLL);
-	else
-		this->setStyle((styleProperty | WS_HSCROLL) & ~ES_AUTOHSCROLL);
-
-	if (destroyed)
-		this->create();
-}
-
-LRESULT TTextArea::windowProcHandler(TMessage& message)
-{
-	if(message.msg == WM_GETDLGCODE)
-		return DLGC_WANTALLKEYS; // to catch TAB key
-
-	return TEditBox::windowProcHandler(message);
-}
-
-TTextArea::~TTextArea()
-{
-}
-
-// =========== TToolTip.cpp ===========
-
-/*
-	MCL - TToolTip.cpp
-	Copyright (C) 2019 CrownSoft
-  
-	This software is provided 'as-is', without any express or implied
-	warranty.  In no event will the authors be held liable for any damages
-	arising from the use of this software.
-
-	Permission is granted to anyone to use this software for any purpose,
-	including commercial applications, and to alter it and redistribute it
-	freely, subject to the following restrictions:
-
-	1. The origin of this software must not be misrepresented; you must not
-	   claim that you wrote the original software. If you use this software
-	   in a product, an acknowledgment in the product documentation would be
-	   appreciated but is not required.
-	2. Altered source versions must be plainly marked as such, and must not be
-	   misrepresented as being the original software.
-	3. This notice may not be removed or altered from any source distribution.
-	  
-*/
-
-
-TToolTip::TToolTip()
-{
-	attachedControl = 0;
-	classNameProperty.assignStaticText(TXT_WITH_LEN("tooltips_class32"));
-
-	styleProperty = WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX;
-}
-
-TToolTip::~TToolTip()
-{
-}
-
-void TToolTip::attachToControl(TWindow *parentWindow, TControl *attachedControl)
-{
-	parentProperty = parentWindow->getHandle();
-	this->attachedControl = attachedControl->getHandle();
-
-	handleProperty = ::CreateWindowExW(0, classNameProperty, NULL, styleProperty, 
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentProperty,
-		NULL, TApplication::hInstance, 0);
-
-	if (handleProperty)
-	{
-		::SetWindowPos(handleProperty, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
-		::AttachMCLPropertiesToHWND(handleProperty, (TComponent*)this);
-
-		TOOLINFOW toolInfo = { 0 };
-		toolInfo.cbSize = sizeof(TOOLINFOW);
-		toolInfo.hwnd = parentProperty;
-		toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-		toolInfo.uId = (UINT_PTR)this->attachedControl;
-		toolInfo.lpszText = textProperty;
-
-		SendMessageW(handleProperty, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
-	}
-}
-
-bool TToolTip::create()
-{
-	return false;
-}
-
-void TToolTip::setText(const TString& caption)
-{
-	textProperty = caption;
-
-	if (handleProperty)
-	{
-		TOOLINFOW toolInfo = { 0 };
-		toolInfo.cbSize = sizeof(TOOLINFOW);
-		toolInfo.hwnd = parentProperty;
-		toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
-		toolInfo.uId = (UINT_PTR)attachedControl;
-		toolInfo.lpszText = textProperty;
-		toolInfo.hinst = TApplication::hInstance;
-
-		SendMessageW(handleProperty, TTM_UPDATETIPTEXT, 0, (LPARAM)&toolInfo);
-	}
-}
 
 
 // =========== TWindow.cpp ===========
@@ -3624,7 +1793,7 @@ TWindow::TWindow()
 	lastFocusedChild = 0;
 }
 
-void TWindow::setParent(HWND parentHandle)
+void TWindow::setParentImpl(HWND parentHandle)
 {
 	parentProperty = parentHandle;
 	if (handleProperty)
@@ -3786,7 +1955,7 @@ LRESULT TWindow::windowProcHandler(TMessage& message)
 			{
 				if( (HIWORD(message.wParam) == 0) && (message.lParam == 0) ) // its menu item! unfortunately windows does not send menu handle with clicked event!
 				{
-					TMenuItem *menuItem = TPlatformUtil::getInstance()->getMenuItemByID(LOWORD(message.wParam));
+					TWinMenuItem *menuItem = TPlatformUtil::getInstance()->getMenuItemByID(LOWORD(message.wParam));
 					if(menuItem)
 					{
 						if (menuItem->onPress) // is event assigned
@@ -3861,6 +2030,1835 @@ TWindow::~TWindow()
 {
 
 }
+
+// =========== TWinEditBox.cpp ===========
+
+/*
+	MCL - TWinEditBox.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinEditBox::TWinEditBox()
+{
+	classNameProperty.assignStaticText(TXT_WITH_LEN("EDIT"));
+
+	widthProperty = 100;
+	heightProperty = 20;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	readOnlyProperty = false;
+	onChange = nullptr;
+
+	styleProperty |= WS_TABSTOP | ES_AUTOHSCROLL;
+	extendedStyleProperty = WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE;
+}
+
+bool TWinEditBox::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == EN_CHANGE))
+	{
+		if (onChange)
+			onChange(this);
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinEditBox::isReadOnlyImpl()
+{
+	return readOnlyProperty;
+}
+
+void TWinEditBox::setReadOnlyImpl(bool readOnly_)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	readOnlyProperty = readOnly_;
+
+	if (readOnlyProperty)
+		this->setStyle(styleProperty | ES_READONLY);
+	else
+		this->setStyle(styleProperty & ~ES_READONLY);
+
+	if (destroyed)
+		this->create();
+}
+
+void TWinEditBox::setLowercaseOnlyImpl(bool lowercaseOnly_)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	if (styleProperty & ES_UPPERCASE) // remove upper case style if already set
+		styleProperty &= ~ES_UPPERCASE;
+
+	if (lowercaseOnly_)
+		this->setStyle(styleProperty | ES_LOWERCASE);
+	else
+		this->setStyle(styleProperty & ~ES_LOWERCASE);
+
+	if (destroyed)
+		this->create();
+}
+
+void TWinEditBox::setUppercaseOnlyImpl(bool uppercaseOnly_)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	if (styleProperty & ES_LOWERCASE) // remove lower case style if already set
+		styleProperty &= ~ES_LOWERCASE;
+
+	if (uppercaseOnly_)
+		this->setStyle(styleProperty | ES_UPPERCASE);
+	else
+		this->setStyle(styleProperty & ~ES_UPPERCASE);
+
+	if (destroyed)
+		this->create();
+}
+
+TString TWinEditBox::getTextImpl()
+{
+	if(handleProperty)
+	{
+		const int length = ::GetWindowTextLengthW(handleProperty);
+		if(length)
+		{
+			const int size = (length + 1) * sizeof(wchar_t);
+			wchar_t* text = (wchar_t*)::malloc(size);
+			text[0] = 0;
+			::GetWindowTextW(handleProperty, text, size);
+			textProperty = TString(text, TString::FREE_TEXT_WHEN_DONE);
+		}else
+		{
+			textProperty = TString();
+		}
+	}
+	return textProperty;
+}
+
+bool TWinEditBox::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+TWinEditBox::~TWinEditBox()
+{
+}
+
+// =========== TWinGlyphButton.cpp ===========
+
+/*
+	MCL - TWinGlyphButton.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+#include <windows.h>
+
+TWinGlyphButton::TWinGlyphButton()
+{
+	glyphFont = 0;
+	glyphChar = 0;
+	glyphLeft = 6;
+}
+
+TWinGlyphButton::~TWinGlyphButton()
+{
+}
+
+void TWinGlyphButton::setGlyph(const wchar_t *glyphChar, HFONT glyphFont, COLORREF glyphColor, int glyphLeft)
+{
+	this->glyphChar = glyphChar;
+	this->glyphFont = glyphFont;
+	this->glyphColor = glyphColor;
+	this->glyphLeft = glyphLeft;
+
+	this->repaint();
+}
+
+bool TWinGlyphButton::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if (glyphFont)
+	{
+		if (message.msg == WM_NOTIFY)
+		{
+			if (((LPNMHDR)message.lParam)->code == NM_CUSTOMDRAW) // custom drawing msg received for this component
+			{
+				LPNMCUSTOMDRAW lpNMCD = (LPNMCUSTOMDRAW)message.lParam;
+
+				result = CDRF_DODEFAULT; // take the default processing unless we set this to something else below.
+
+				if (CDDS_PREPAINT == lpNMCD->dwDrawStage) // it's the control's prepaint stage, tell Windows we want message after paint.
+				{
+					result = CDRF_NOTIFYPOSTPAINT;
+				}
+				else if (CDDS_POSTPAINT == lpNMCD->dwDrawStage) //  postpaint stage
+				{
+					const RECT rc = lpNMCD->rc;
+					const bool bDisabled = (lpNMCD->uItemState & (CDIS_DISABLED | CDIS_GRAYED)) != 0;
+
+					HGDIOBJ oldFont = ::SelectObject(lpNMCD->hdc, glyphFont);
+					const COLORREF oldTextColor = ::SetTextColor(lpNMCD->hdc, bDisabled ? ::GetSysColor(COLOR_GRAYTEXT) : glyphColor);
+					const int oldBkMode = ::SetBkMode(lpNMCD->hdc, TRANSPARENT);
+
+					RECT rcIcon = { rc.left + glyphLeft, rc.top, rc.right, rc.bottom };
+					::DrawTextW(lpNMCD->hdc, glyphChar, 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER); // draw glyph
+
+					::SetBkMode(lpNMCD->hdc, oldBkMode);
+					::SetTextColor(lpNMCD->hdc, oldTextColor);
+					::SelectObject(lpNMCD->hdc, oldFont);
+
+					result = CDRF_DODEFAULT;
+				}
+
+				return true; // indicate that we processed this msg & result is valid.
+			}
+		}
+	}
+
+	return TWinButton::notifyProcHandler(message, result); // pass unprocessed messages to parent
+}
+
+// =========== TWinGridView.cpp ===========
+
+/*
+	MCL - TWinGridView.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinGridView::TWinGridView(bool sortItems)
+{
+	itemCount = 0;
+	colCount = 0;
+
+	onItemSelect = nullptr;
+	onItemRightClick = nullptr;
+	onItemDoubleClick = nullptr;
+
+	classNameProperty.assignStaticText(TXT_WITH_LEN("SysListView32"));
+
+	widthProperty = 300;
+	heightProperty = 200;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	styleProperty |= WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL;
+	extendedStyleProperty = WS_EX_WINDOWEDGE;
+
+	if (sortItems)
+		styleProperty |= LVS_SORTASCENDING;
+}
+
+TWinGridView::~TWinGridView(){}
+
+void TWinGridView::insertRecord(TString **columnsData)
+{
+	LVITEMW lvi = { 0 };
+	lvi.mask = LVIF_TEXT;
+	lvi.pszText = (*columnsData[0]);
+	lvi.iItem = itemCount;
+
+	const int row = (int)::SendMessageW(handleProperty, LVM_INSERTITEMW, 0, (LPARAM)&lvi);
+
+	for (int i = 1; i < colCount; i++) // first column already added, lets add the others
+	{
+		LV_ITEMW lvItem = { 0 };
+		lvItem.iSubItem = i;
+		lvItem.pszText = (*columnsData[i]);
+
+		::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)row, (LPARAM)&lvItem);
+	}
+
+	++itemCount;
+}
+
+void TWinGridView::insertRecordTo(int rowIndex, TString **columnsData)
+{
+	LVITEMW lvi = { 0 };
+	lvi.mask = LVIF_TEXT;
+	lvi.pszText = (*columnsData[0]);
+	lvi.iItem = rowIndex;
+
+	const int row = (int)::SendMessageW(handleProperty, LVM_INSERTITEMW, 0, (LPARAM)&lvi);
+
+	for (int i = 1; i < colCount; i++) // first column already added, lets add the others
+	{
+		LV_ITEMW lvItem= { 0 };
+		lvItem.iSubItem = i;
+		lvItem.pszText = (*columnsData[i]);
+
+		::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)row, (LPARAM)&lvItem);
+	}
+
+	++itemCount;
+}
+
+TString TWinGridView::getRecordAt(int rowIndex, int columnIndex)
+{
+	wchar_t *buffer = (wchar_t*)::malloc(512 * sizeof(wchar_t));
+	buffer[0] = 0;
+
+	LV_ITEMW lvi = { 0 };
+	lvi.iSubItem = columnIndex;
+	lvi.cchTextMax = 512;
+	lvi.pszText = buffer;
+
+	::SendMessageW(handleProperty, LVM_GETITEMTEXTW, (WPARAM)rowIndex, (LPARAM)&lvi); // explicity call unicode version. we can't use ListView_GetItemText macro. it relies on preprocessor defs.
+
+	return TString(buffer, TString::FREE_TEXT_WHEN_DONE);
+}
+
+int TWinGridView::getSelectedRow()
+{
+	return ListView_GetNextItem(handleProperty, -1, LVNI_SELECTED);
+}
+
+void TWinGridView::removeRecordAt(int rowIndex)
+{
+	if (ListView_DeleteItem(handleProperty, rowIndex))
+		--itemCount;
+}
+
+void TWinGridView::removeAll()
+{
+	ListView_DeleteAllItems(handleProperty);
+	itemCount = 0;
+}
+
+void TWinGridView::updateRecordAt(int rowIndex, int columnIndex, const TString& text)
+{
+	LV_ITEMW lvi = { 0 };
+	lvi.iSubItem = columnIndex;
+	lvi.pszText = text;
+
+	::SendMessageW(handleProperty, LVM_SETITEMTEXTW, (WPARAM)rowIndex, (LPARAM)&lvi); // explicity call unicode version. we can't use ListView_SetItemText macro. it relies on preprocessor defs.
+}
+
+void TWinGridView::setColumnWidth(int columnIndex, int columnWidth)
+{
+	ListView_SetColumnWidth(handleProperty, columnIndex, columnWidth);
+}
+
+int TWinGridView::getColumnWidth(int columnIndex)
+{
+	return ListView_GetColumnWidth(handleProperty, columnIndex);
+}
+
+void TWinGridView::createColumn(const TString& text, int columnWidth)
+{
+	LVCOLUMN lvc = { 0 };
+
+	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	lvc.fmt = LVCFMT_LEFT;
+	lvc.cx = columnWidth;
+	lvc.pszText = text;
+	lvc.iSubItem = colCount;
+
+	::SendMessageW(handleProperty, LVM_INSERTCOLUMNW, (WPARAM)colCount, (LPARAM)&lvc);
+
+	++colCount;
+}
+
+bool TWinGridView::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if (message.msg == WM_NOTIFY)
+	{
+		if (((LPNMHDR)message.lParam)->code == LVN_ITEMCHANGED) // List view item selection changed (mouse or keyboard)
+		{
+			LPNMLISTVIEW pNMListView = (LPNMLISTVIEW)message.lParam;
+			if ((pNMListView->uChanged & LVIF_STATE) && (pNMListView->uNewState & LVIS_SELECTED))
+			{
+				if (onItemSelect)
+					onItemSelect(this, this->getSelectedRow());
+
+				result = 0;
+				return true;
+			}
+		}
+		else if (((LPNMHDR)message.lParam)->code == NM_RCLICK) // List view item right click
+		{
+			if(onItemRightClick)
+				onItemRightClick(this, this->getSelectedRow());
+
+			result = 0;
+			return true;
+		}
+		else if (((LPNMHDR)message.lParam)->code == NM_DBLCLK) // List view item double click
+		{
+			if(onItemDoubleClick)
+				onItemDoubleClick(this, this->getSelectedRow());
+
+			result = 0;
+			return true;
+		}
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinGridView::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		ListView_SetExtendedListViewStyle(handleProperty, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+
+
+// =========== TWinGroupBox.cpp ===========
+
+/*
+	MCL - TWinGroupBox.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinGroupBox::TWinGroupBox()
+{
+	classNameProperty.assignStaticText(TXT_WITH_LEN("BUTTON"));
+	textProperty.assignStaticText(TXT_WITH_LEN("GroupBox"));
+
+	widthProperty = 100;
+	heightProperty = 100;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	styleProperty |= BS_GROUPBOX;
+	extendedStyleProperty = WS_EX_WINDOWEDGE;
+}
+
+bool TWinGroupBox::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+TWinGroupBox::~TWinGroupBox()
+{
+}
+
+// =========== TWinLabel.cpp ===========
+
+/*
+	MCL - TWinLabel.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinLabel::TWinLabel()
+{
+	classNameProperty.assignStaticText(TXT_WITH_LEN("STATIC"));
+	textProperty.assignStaticText(TXT_WITH_LEN("Label"));
+
+	widthProperty = 100;
+	heightProperty = 25;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	styleProperty |= BS_NOTIFY;
+	extendedStyleProperty = WS_EX_WINDOWEDGE;
+}
+
+bool TWinLabel::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+TWinLabel::~TWinLabel()
+{
+}
+
+// =========== TWinListBox.cpp ===========
+
+/*
+	MCL - TWinListBox.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+#define INITIAL_LIST_ITEM_COUNT 100
+
+TWinListBox::TWinListBox(bool multipleSelection, bool sort, bool vscroll)
+{
+	this->multipleSelection = multipleSelection;
+
+	onItemSelect = nullptr;
+	onItemDoubleClick = nullptr;
+
+	selectedItemIndex = -1;
+	selectedItemEnd = -1;
+
+	classNameProperty.assignStaticText(TXT_WITH_LEN("LISTBOX"));
+
+	widthProperty = 100;
+	heightProperty = 100;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	styleProperty |= LBS_NOTIFY | WS_TABSTOP;
+	extendedStyleProperty = WS_EX_CLIENTEDGE | WS_EX_WINDOWEDGE;
+
+	if(multipleSelection)
+		styleProperty |= LBS_MULTIPLESEL;
+	if(sort)
+		styleProperty |= LBS_SORT;
+	if(vscroll)
+		styleProperty |= WS_VSCROLL;
+
+	stringList = new TPointerList<TString*>(INITIAL_LIST_ITEM_COUNT);
+}
+
+void TWinListBox::addItem(const TString& text)
+{
+	TString *str = new TString(text);
+	stringList->addPointer(str);
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, LB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*str);
+}
+
+void TWinListBox::removeItem(int index)
+{
+	TString *text = stringList->getPointer(index);
+	if (text)
+		delete text;
+
+	stringList->removePointer(index);
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, LB_DELETESTRING, index, 0);
+}
+
+void TWinListBox::removeItem(const TString& text)
+{
+	const int itemIndex = this->getItemIndex(text);
+	if(itemIndex > -1)
+		this->removeItem(itemIndex);
+}
+
+int TWinListBox::getItemIndex(const TString& text)
+{
+	const int listSize = stringList->getSize();
+	if(listSize)
+	{
+		for(int i = 0; i < listSize; i++)
+		{
+			if (stringList->getPointer(i)->compare(text))
+				return i;
+		}
+	}
+	return -1;
+}
+
+int TWinListBox::getItemCount()
+{
+	return stringList->getSize();
+}
+
+int TWinListBox::getSelectedItemIndex()
+{
+	if(handleProperty)
+	{	 
+		const int index = (int)::SendMessageW(handleProperty, LB_GETCURSEL, 0, 0);
+		if(index != LB_ERR)
+			return index;
+	}
+	return -1;	
+}
+
+TString TWinListBox::getSelectedItem()
+{
+	const int itemIndex = this->getSelectedItemIndex();
+	if(itemIndex > -1)
+		return *stringList->getPointer(itemIndex);
+	return TString();
+}
+
+int TWinListBox::getSelectedItems(int* itemArray, int itemCountInArray)
+{
+	if(handleProperty)
+	{	 
+		const int items = (int)::SendMessageW(handleProperty, LB_GETSELITEMS, itemCountInArray, (LPARAM)itemArray);
+		if(items != LB_ERR)
+			return items;
+	}
+	return -1;
+}
+
+void TWinListBox::clearList()
+{
+	stringList->deleteAll(true);
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, LB_RESETCONTENT, 0, 0);
+}
+
+void TWinListBox::selectItem(int index)
+{
+	selectedItemIndex = index;
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, LB_SETCURSEL, index, 0);
+}
+
+void TWinListBox::selectItems(int start, int end)
+{
+	if(multipleSelection)
+	{
+		selectedItemIndex = start;
+		selectedItemEnd = end;
+
+		if(handleProperty)
+			::SendMessageW(handleProperty, LB_SELITEMRANGE, TRUE, MAKELPARAM(start, end));
+	}
+}
+
+bool TWinListBox::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if (message.msg == WM_COMMAND)
+	{
+		if (HIWORD(message.wParam) == LBN_SELCHANGE) // listbox sel change!
+		{
+			if (onItemSelect)
+				onItemSelect(this, this->getSelectedItemIndex());
+
+			result = 0;
+			return true;
+		}
+		else if (HIWORD(message.wParam) == LBN_DBLCLK) // listbox double click
+		{
+			if(onItemDoubleClick)
+				onItemDoubleClick(this, this->getSelectedItemIndex());
+
+			result = 0;
+			return true;
+		}
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinListBox::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+
+		const int listSize = stringList->getSize();
+		if (listSize)
+		{
+			for (int i = 0; i < listSize; i++)
+				::SendMessageW(handleProperty, LB_ADDSTRING, 0, (LPARAM)(const wchar_t*)*stringList->getPointer(i));
+		}
+
+		if (!multipleSelection) // single selction!
+		{
+			if (selectedItemIndex > -1)
+				::SendMessageW(handleProperty, LB_SETCURSEL, selectedItemIndex, 0);
+		}
+		else
+		{
+			if (selectedItemIndex > -1)
+				::SendMessageW(handleProperty, LB_SELITEMRANGE, TRUE, MAKELPARAM(selectedItemIndex, selectedItemEnd));
+		}
+
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+
+TWinListBox::~TWinListBox()
+{
+	stringList->deleteAll(false);
+	delete stringList;
+}
+
+// =========== TWinMenu.cpp ===========
+
+/*
+	MCL - TWinMenu.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinMenu::TWinMenu()
+{
+	hMenu = ::CreatePopupMenu();
+}
+
+void TWinMenu::add(TWinMenuItem& menuItem)
+{
+	menuItem.addToMenu(hMenu);
+}
+
+void TWinMenu::addSubMenu(const TString& text, const TWinMenu& menu)
+{
+	::InsertMenuW(hMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(HMENU)menu, text);
+}
+
+void TWinMenu::addSeperator()
+{
+	MENUITEMINFOW mii;
+	::ZeroMemory(&mii, sizeof(mii));
+
+	mii.cbSize = sizeof(MENUITEMINFOW);
+	mii.fMask = MIIM_TYPE;
+	mii.fType = MFT_SEPARATOR;
+
+	::InsertMenuItemW(hMenu, 0xFFFFFFFF, FALSE, &mii);
+}
+
+HMENU TWinMenu::getMenuHandle()
+{
+	return hMenu;
+}
+
+TWinMenu::operator HMENU()const
+{
+	return hMenu;
+}
+
+void TWinMenu::popUpMenu(TWindow& window)
+{
+	if(window)
+	{
+		POINT p;
+		::GetCursorPos(&p);
+		::TrackPopupMenu(hMenu, TPM_LEFTBUTTON, p.x, p.y, 0, window, NULL);
+	}
+}
+
+TWinMenu::~TWinMenu()
+{
+	::DestroyMenu(hMenu);
+}
+
+// =========== TWinMenuBar.cpp ===========
+
+/*
+	MCL - TWinMenuBar.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinMenuBar::TWinMenuBar()
+{
+	hMenu = ::CreateMenu();
+}
+
+void TWinMenuBar::add(const TString& text, const TWinMenu& menu)
+{
+	::InsertMenuW(hMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_POPUP | MF_STRING, (UINT_PTR)(HMENU)menu, text);
+}
+
+HMENU TWinMenuBar::getHandle()
+{
+	return hMenu;
+}
+
+TWinMenuBar::operator HMENU()const
+{
+	return hMenu;
+}
+
+TWinMenuBar::~TWinMenuBar()
+{
+	::DestroyMenu(hMenu);
+}
+
+// =========== TWinMenuButton.cpp ===========
+
+/*
+	MCL - TWinMenuButton.cpp
+	Copyright (C) 2019 CrownSoft
+
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+
+*/
+
+
+TWinMenuButton::TWinMenuButton()
+{
+	buttonMenu = 0;
+	glyphFont = 0;
+	glyphChar = 0;
+	glyphLeft = 6;
+	arrowFont = new TFont(CONST_TXT("Webdings"), 18);
+}	
+
+TWinMenuButton::~TWinMenuButton()
+{
+	delete arrowFont;
+}
+
+void TWinMenuButton::setMenuImpl(TWinMenu& buttonMenu_)
+{
+	buttonMenu = &buttonMenu_;
+}
+
+void TWinMenuButton::setGlyph(const wchar_t *glyphChar, HFONT glyphFont, COLORREF glyphColor, int glyphLeft)
+{
+	this->glyphChar = glyphChar;
+	this->glyphFont = glyphFont;
+	this->glyphColor = glyphColor;
+	this->glyphLeft = glyphLeft;
+
+	this->repaint();
+}
+
+bool TWinMenuButton::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if (message.msg == WM_NOTIFY)
+	{		
+		if (((LPNMHDR)message.lParam)->code == NM_CUSTOMDRAW) // custom drawing msg received for this component
+		{
+			LPNMCUSTOMDRAW lpNMCD = (LPNMCUSTOMDRAW)message.lParam;
+
+			result = CDRF_DODEFAULT; // take the default processing unless we set this to something else below.
+
+			if (CDDS_PREPAINT == lpNMCD->dwDrawStage) // it's the control's prepaint stage, tell Windows we want message after paint.
+			{
+				result = CDRF_NOTIFYPOSTPAINT;
+			}
+			else if ( CDDS_POSTPAINT== lpNMCD->dwDrawStage ) //  postpaint stage
+			{
+				const RECT rc = lpNMCD->rc;
+				TGraphics::draw3dVLine(lpNMCD->hdc, rc.right - 22, rc.top + 6, rc.bottom - 12); // draw line
+
+				const bool bDisabled = (lpNMCD->uItemState & (CDIS_DISABLED|CDIS_GRAYED)) != 0;
+
+				HGDIOBJ oldFont = ::SelectObject(lpNMCD->hdc, arrowFont->getFontHandle());
+				const COLORREF oldTextColor = ::SetTextColor(lpNMCD->hdc, ::GetSysColor(bDisabled ? COLOR_GRAYTEXT : COLOR_BTNTEXT));
+				const int oldBkMode = ::SetBkMode(lpNMCD->hdc, TRANSPARENT);
+
+				RECT rcIcon = { rc.right - 18, rc.top, rc.right, rc.bottom };
+				::DrawTextW(lpNMCD->hdc, L"\x36", 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER); // draw arrow
+
+				if (glyphFont) // draw glyph
+				{
+					::SelectObject(lpNMCD->hdc, glyphFont);
+					::SetTextColor(lpNMCD->hdc, bDisabled ? ::GetSysColor(COLOR_GRAYTEXT) : glyphColor);
+
+					rcIcon = { rc.left + glyphLeft, rc.top, rc.right, rc.bottom };
+					::DrawTextW(lpNMCD->hdc, glyphChar, 1, &rcIcon, DT_SINGLELINE | DT_LEFT | DT_VCENTER);
+				}
+
+				::SetBkMode(lpNMCD->hdc, oldBkMode);
+				::SetTextColor(lpNMCD->hdc, oldTextColor);
+				::SelectObject(lpNMCD->hdc, oldFont);
+
+				result = CDRF_DODEFAULT;
+			}
+
+			return true; // indicate that we processed this msg & result is valid.
+		}
+	}
+	else if ((message.msg == WM_COMMAND) && (HIWORD(message.wParam) == BN_CLICKED))
+	{
+		if (buttonMenu)
+		{
+			POINT point = { leftProperty, topProperty };
+			::ClientToScreen(parentProperty, &point); // get screen cordinates
+
+			::TrackPopupMenu(buttonMenu->getMenuHandle(), TPM_LEFTBUTTON, point.x, point.y + heightProperty, 0, parentProperty, NULL);
+		}
+
+		if (onPress)
+			onPress(this);
+
+		result = 0;
+		return true;
+	}
+
+	return TWinButton::notifyProcHandler(message, result); // pass unprocessed messages to parent
+}
+
+// =========== TWinMenuItem.cpp ===========
+
+/*
+	MCL - TWinMenuItem.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinMenuItem::TWinMenuItem()
+{
+	MCL_INIT_VERIFIER;
+	hMenu = 0;
+	onPress = nullptr;
+	enabled = true;
+	checked = false;
+	itemID = TPlatformUtil::getInstance()->generateMenuItemID(this);
+}
+
+void TWinMenuItem::addToMenu(HMENU hMenu)
+{
+	this->hMenu = hMenu;
+
+	MENUITEMINFOW mii;
+	::ZeroMemory(&mii, sizeof(mii));
+
+	mii.cbSize = sizeof(MENUITEMINFOW);
+	mii.fMask = MIIM_DATA | MIIM_ID | MIIM_STATE | MIIM_TYPE;
+	mii.fType = MFT_STRING;
+	mii.dwTypeData = (LPWSTR)(const wchar_t*)textProperty;
+	mii.cch = lstrlenW((LPWSTR)(const wchar_t*)textProperty);
+	mii.fState = (enabled ? MFS_ENABLED : MFS_DISABLED) | (checked ? MFS_CHECKED : MFS_UNCHECKED);
+	mii.wID = itemID;
+	mii.dwItemData = (ULONG_PTR)this; // for future!
+
+	::InsertMenuItemW(hMenu, itemID, FALSE, &mii);
+}
+
+bool TWinMenuItem::isChecked()
+{
+	return checked;
+}
+
+void TWinMenuItem::setCheckedState(bool state)
+{
+	checked = state;
+	if(hMenu) // it's alredy created menu item!
+	{
+		MENUITEMINFOW mii;
+		::ZeroMemory(&mii, sizeof(mii));
+
+		mii.cbSize = sizeof(MENUITEMINFOW);
+		mii.fMask = MIIM_STATE;
+		mii.fState = checked ? MFS_CHECKED : MFS_UNCHECKED;
+
+		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
+	}
+}
+
+bool TWinMenuItem::isEnabled()
+{
+	return enabled; 
+}
+
+void TWinMenuItem::setEnabled(bool state)
+{
+	enabled = state;
+	if(hMenu) // it's alredy created menu item!
+	{
+		MENUITEMINFOW mii;
+		::ZeroMemory(&mii, sizeof(mii));
+
+		mii.cbSize = sizeof(MENUITEMINFOW);
+		mii.fMask = MIIM_STATE;
+		mii.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+
+		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
+	}
+}
+
+void TWinMenuItem::setTextImpl(const TString& text)
+{
+	textProperty = text;
+	if(hMenu) // it's alredy created menu item!
+	{
+		MENUITEMINFOW mii;
+		::ZeroMemory(&mii, sizeof(mii));
+
+		mii.cbSize = sizeof(MENUITEMINFOW);
+		mii.fMask = MIIM_TYPE;
+		mii.fType = MFT_STRING;
+		mii.dwTypeData = (LPWSTR)(const wchar_t*)textProperty;
+		mii.cch = lstrlenW((LPWSTR)(const wchar_t*)textProperty);
+
+		::SetMenuItemInfoW(hMenu, itemID, FALSE, &mii);
+	}
+}
+
+TString TWinMenuItem::getTextImpl()
+{
+	return textProperty;
+}
+
+UINT TWinMenuItem::getItemID()
+{
+	return itemID;
+}
+
+HMENU TWinMenuItem::getMenuHandle()
+{
+	return hMenu;
+}
+
+TWinMenuItem::~TWinMenuItem()
+{
+}
+
+
+// =========== TWinNumericField.cpp ===========
+
+/*
+	MCL - TWinNumericField.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinNumericField::TWinNumericField()
+{
+	styleProperty |= ES_NUMBER;
+}
+
+TWinNumericField::~TWinNumericField(){}
+
+// =========== TWinPasswordBox.cpp ===========
+
+/*
+	MCL - TWinPasswordBox.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinPasswordBox::TWinPasswordBox()
+{
+	passwordCharProperty = '*';
+	styleProperty |= ES_PASSWORD;
+}
+
+void TWinPasswordBox::setPasswordCharImpl(const char pwdChar)
+{
+	this->passwordCharProperty = pwdChar;
+	if(handleProperty)
+	{
+		::SendMessageW(handleProperty, EM_SETPASSWORDCHAR, passwordCharProperty, 0);
+		this->repaint();
+	}
+}
+
+char TWinPasswordBox::getPasswordCharImpl()
+{
+	return passwordCharProperty;
+}
+
+bool TWinPasswordBox::create()
+{
+	if(TWinEditBox::create())
+	{
+		::SendMessageW(handleProperty, EM_SETPASSWORDCHAR, passwordCharProperty, 0);
+		return true;
+	}
+	return false;
+}
+
+TWinPasswordBox::~TWinPasswordBox()
+{
+}
+
+// =========== TWinProgressBar.cpp ===========
+
+/*
+	MCL - TWinProgressBar.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinProgressBar::TWinProgressBar()
+{
+	progress = 0;
+
+	classNameProperty.assignStaticText(TXT_WITH_LEN("msctls_progress32"));
+
+	widthProperty = 100;
+	heightProperty = 20;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	extendedStyleProperty = WS_EX_WINDOWEDGE;
+	styleProperty |= PBS_SMOOTH;
+}
+
+void TWinProgressBar::setEnableSmoothImpl(bool smooth_)
+{
+	if (smooth_)
+		this->setStyle(styleProperty | PBS_SMOOTH);
+	else
+		this->setStyle(styleProperty & ~PBS_SMOOTH);
+}
+
+void TWinProgressBar::setOrientationImpl(bool vertical_)
+{
+	if (vertical_)
+		this->setStyle(styleProperty | PBS_VERTICAL);
+	else
+		this->setStyle(styleProperty & ~PBS_VERTICAL);
+}
+
+int TWinProgressBar::getValueImpl()
+{
+	return progress;
+}
+
+void TWinProgressBar::setValueImpl(int val)
+{
+	this->progress = val;
+
+	if(handleProperty)
+		::SendMessageW(handleProperty, PBM_SETPOS, progress, 0);
+}
+
+bool TWinProgressBar::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, PBM_SETRANGE, 0, MAKELPARAM(0, 100)); // set range between 0-100
+		::SendMessageW(handleProperty, PBM_SETPOS, value, 0); // set current value!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+TWinProgressBar::~TWinProgressBar()
+{
+}
+
+// =========== TWinPushButton.cpp ===========
+
+/*
+	MCL - TWinPushButton.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinPushButton::TWinPushButton()
+{
+	classNameProperty.assignStaticText(TXT_WITH_LEN("Push Button"));
+	styleProperty |= BS_PUSHLIKE;
+}
+
+TWinPushButton::~TWinPushButton()
+{
+}
+
+// =========== TWinRadioButton.cpp ===========
+
+/*
+	MCL - TWinRadioButton.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinRadioButton::TWinRadioButton()
+{
+	textProperty.assignStaticText(TXT_WITH_LEN("RadioButton"));
+
+	styleProperty &= ~BS_AUTOCHECKBOX; // remove inherited checkbox style
+	styleProperty |= BS_RADIOBUTTON;
+
+}
+
+TWinRadioButton::~TWinRadioButton()
+{
+}
+
+// =========== TWinSlider.cpp ===========
+
+/*
+	MCL - TWinSlider.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinSlider::TWinSlider()
+{
+	rangeMin = 0;
+	rangeMax = 100;
+	positionProperty = 0;
+	onChange = nullptr;
+
+	widthProperty = 100;
+	heightProperty = 25;
+
+	leftProperty = 0;
+	topProperty = 0;
+
+	styleProperty |= WS_TABSTOP | TBS_NOTICKS | TBS_HORZ;
+	extendedStyleProperty = WS_EX_WINDOWEDGE;
+
+	classNameProperty.assignStaticText(TXT_WITH_LEN("msctls_trackbar32"));
+}
+
+void TWinSlider::setEnableTicksImpl(bool enableTicks)
+{
+	if (enableTicks)
+		this->setStyle((styleProperty & ~TBS_NOTICKS) | TBS_AUTOTICKS);
+	else
+		this->setStyle((styleProperty & ~TBS_AUTOTICKS) | TBS_NOTICKS);
+}
+
+void TWinSlider::setOrientationImpl(bool vertical)
+{
+	if (vertical)
+		this->setStyle((styleProperty & ~TBS_HORZ) | TBS_VERT);
+	else
+		this->setStyle((styleProperty & ~TBS_VERT) | TBS_HORZ);
+}
+
+void TWinSlider::setRange(int min, int max)
+{
+	rangeMin = min;
+	rangeMax = max;
+	if(handleProperty)
+		::SendMessageW(handleProperty, TBM_SETRANGE, TRUE, (LPARAM) MAKELONG(min, max));
+}
+
+void TWinSlider::setPositionImpl(int pos)
+{
+	this->positionProperty = pos;
+	if(handleProperty)
+		::SendMessageW(handleProperty, TBM_SETPOS, TRUE, (LPARAM)positionProperty);
+}
+
+int TWinSlider::getPositionImpl()
+{
+	return positionProperty;
+}
+
+bool TWinSlider::notifyProcHandler(TMessage& message, LRESULT& result)
+{
+	if( (message.msg == WM_HSCROLL) || (message.msg == WM_VSCROLL) )
+	{
+		const int nScrollCode = (int)LOWORD(message.wParam);
+
+		if( (TB_THUMBTRACK == nScrollCode) || (TB_LINEDOWN == nScrollCode) || (TB_LINEUP == nScrollCode) || 
+			(TB_BOTTOM == nScrollCode) || (TB_TOP == nScrollCode) || (TB_PAGEUP == nScrollCode) || 
+			(TB_PAGEDOWN == nScrollCode) || (TB_THUMBPOSITION == nScrollCode)) // its trackbar!
+		{
+			positionProperty = (int)::SendMessageW(handleProperty, TBM_GETPOS, 0, 0);
+
+			if (onChange)
+				onChange(this, positionProperty);
+			
+			result = 0;
+			return true;
+		}
+	}
+
+	return TControl::notifyProcHandler(message, result);
+}
+
+bool TWinSlider::create()
+{
+	if (!parentProperty) // user must specify parent handle!
+		return false;
+
+	isRegistered = false; // we don't want to unregister this class.
+
+	::CreateMCLComponent(this);
+
+	if (handleProperty)
+	{
+		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0)); // set font!
+		::EnableWindow(handleProperty, enabledProperty ? TRUE : FALSE);
+
+		::SendMessageW(handleProperty, TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(rangeMin, rangeMax));
+		::SendMessageW(handleProperty, TBM_SETPOS, TRUE, (LPARAM)positionProperty);
+
+		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
+
+		if (cursorProperty)
+			::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
+
+		return true;
+	}
+	return false;
+}
+
+TWinSlider::~TWinSlider()
+{
+}
+
+
+// =========== TWinTextArea.cpp ===========
+
+/*
+	MCL - TWinTextArea.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinTextArea::TWinTextArea()
+{
+	widthProperty = 200;
+	heightProperty = 100;
+
+	styleProperty |= ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL;
+	styleProperty = styleProperty & ~ES_AUTOHSCROLL; // remove ES_AUTOHSCROLL which comes from TWinEditBox
+}
+
+void TWinTextArea::setEnableVScrollBarImpl(bool enableVScrollBar)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	if (enableVScrollBar)
+		this->setStyle((styleProperty  & ~ES_AUTOVSCROLL) | WS_VSCROLL);
+	else
+		this->setStyle((styleProperty & ~WS_VSCROLL) | ES_AUTOVSCROLL);
+
+	if(destroyed)
+		this->create();
+}
+
+void TWinTextArea::setEnableHScrollBarImpl(bool enableHScrollBar)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	if (enableHScrollBar)
+		this->setStyle((styleProperty & ~ES_AUTOHSCROLL) | WS_HSCROLL);
+	else
+		this->setStyle((styleProperty & ~WS_HSCROLL) | ES_AUTOHSCROLL);
+
+	if (destroyed)
+		this->create();
+}
+
+void TWinTextArea::setEnableWordWrapImpl(bool enableWordWrap)
+{
+	bool destroyed = false;
+
+	if (handleProperty)
+	{
+		this->getText(); // this will update textProperty.
+		this->destroy();
+		destroyed = true;
+	}
+
+	if (enableWordWrap)
+		this->setStyle((styleProperty & ~ES_AUTOHSCROLL) & ~WS_HSCROLL);
+	else
+		this->setStyle((styleProperty | WS_HSCROLL) & ~ES_AUTOHSCROLL);
+
+	if (destroyed)
+		this->create();
+}
+
+LRESULT TWinTextArea::windowProcHandler(TMessage& message)
+{
+	if(message.msg == WM_GETDLGCODE)
+		return DLGC_WANTALLKEYS; // to catch TAB key
+
+	return TWinEditBox::windowProcHandler(message);
+}
+
+TWinTextArea::~TWinTextArea()
+{
+}
+
+// =========== TWinToolTip.cpp ===========
+
+/*
+	MCL - TWinToolTip.cpp
+	Copyright (C) 2019 CrownSoft
+  
+	This software is provided 'as-is', without any express or implied
+	warranty.  In no event will the authors be held liable for any damages
+	arising from the use of this software.
+
+	Permission is granted to anyone to use this software for any purpose,
+	including commercial applications, and to alter it and redistribute it
+	freely, subject to the following restrictions:
+
+	1. The origin of this software must not be misrepresented; you must not
+	   claim that you wrote the original software. If you use this software
+	   in a product, an acknowledgment in the product documentation would be
+	   appreciated but is not required.
+	2. Altered source versions must be plainly marked as such, and must not be
+	   misrepresented as being the original software.
+	3. This notice may not be removed or altered from any source distribution.
+	  
+*/
+
+
+TWinToolTip::TWinToolTip()
+{
+	attachedControl = 0;
+	classNameProperty.assignStaticText(TXT_WITH_LEN("tooltips_class32"));
+
+	styleProperty = WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX;
+}
+
+TWinToolTip::~TWinToolTip()
+{
+}
+
+void TWinToolTip::attachToControl(TWindow *parentWindow, TControl *attachedControl)
+{
+	parentProperty = parentWindow->getHandle();
+	this->attachedControl = attachedControl->getHandle();
+
+	handleProperty = ::CreateWindowExW(0, classNameProperty, NULL, styleProperty, 
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentProperty,
+		NULL, TApplication::hInstance, 0);
+
+	if (handleProperty)
+	{
+		::SetWindowPos(handleProperty, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+		::AttachMCLPropertiesToHWND(handleProperty, (TComponent*)this);
+
+		TOOLINFOW toolInfo = { 0 };
+		toolInfo.cbSize = sizeof(TOOLINFOW);
+		toolInfo.hwnd = parentProperty;
+		toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+		toolInfo.uId = (UINT_PTR)this->attachedControl;
+		toolInfo.lpszText = textProperty;
+
+		SendMessageW(handleProperty, TTM_ADDTOOL, 0, (LPARAM)&toolInfo);
+	}
+}
+
+bool TWinToolTip::create()
+{
+	return false;
+}
+
+void TWinToolTip::setTextImpl(const TString& caption)
+{
+	textProperty = caption;
+
+	if (handleProperty)
+	{
+		TOOLINFOW toolInfo = { 0 };
+		toolInfo.cbSize = sizeof(TOOLINFOW);
+		toolInfo.hwnd = parentProperty;
+		toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+		toolInfo.uId = (UINT_PTR)attachedControl;
+		toolInfo.lpszText = textProperty;
+		toolInfo.hinst = TApplication::hInstance;
+
+		SendMessageW(handleProperty, TTM_UPDATETIPTEXT, 0, (LPARAM)&toolInfo);
+	}
+}
+
 
 // =========== TDirectory.cpp ===========
 
@@ -5697,17 +5695,17 @@ TTimer::TTimer()
 	timerID = TPlatformUtil::getInstance()->generateTimerID(this);
 }
 
-void TTimer::setInterval(int resolution)
+void TTimer::setIntervalImpl(int resolution)
 {
 	this->resolution = resolution;
 }
 
-int TTimer::getInterval()
+int TTimer::getIntervalImpl()
 {
 	return resolution;
 }
 
-void TTimer::setTimerWindow(TWindow &window)
+void TTimer::setTimerWindowImpl(TWindow &window)
 {
 	ownerWindow = &window;
 }
@@ -5722,7 +5720,7 @@ UINT TTimer::getTimerID()
 	return timerID;
 }
 
-void TTimer::setEnabled(bool enable)
+void TTimer::setEnabledImpl(bool enable)
 {
 	if (enable)
 	{
@@ -5755,7 +5753,7 @@ void TTimer::setEnabled(bool enable)
 	}
 }
 
-bool TTimer::isTimerRunning()
+bool TTimer::isTimerRunningImpl()
 {
 	return started;
 }
@@ -5888,12 +5886,12 @@ UINT TPlatformUtil::generateControlID()
 	return retVal;
 }
 
-UINT TPlatformUtil::generateMenuItemID(TMenuItem *menuItem)
+UINT TPlatformUtil::generateMenuItemID(TWinMenuItem *menuItem)
 {
 	::EnterCriticalSection(&criticalSectionForCount);
 
 	if (menuItemList == 0) // generate on first call
-		menuItemList = new TPointerList<TMenuItem*>(mcl_InitialMenuItemCount);
+		menuItemList = new TPointerList<TWinMenuItem*>(mcl_InitialMenuItemCount);
 
 	++menuItemCount;
 	menuItemList->addPointer(menuItem);
@@ -5904,7 +5902,7 @@ UINT TPlatformUtil::generateMenuItemID(TMenuItem *menuItem)
 	return retVal;
 }
 
-TMenuItem* TPlatformUtil::getMenuItemByID(UINT id)
+TWinMenuItem* TPlatformUtil::getMenuItemByID(UINT id)
 {
 	if (menuItemList)
 		return menuItemList->getPointer(id - (mcl_InitialMenuItemID + 1));

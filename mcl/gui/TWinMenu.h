@@ -1,8 +1,8 @@
 
 /*
-	MCL - TControl.h
+	MCL - TWinMenu.h
 	Copyright (C) 2019 CrownSoft
-
+  
 	This software is provided 'as-is', without any express or implied
 	warranty.  In no event will the authors be held liable for any damages
 	arising from the use of this software.
@@ -18,32 +18,37 @@
 	2. Altered source versions must be plainly marked as such, and must not be
 	   misrepresented as being the original software.
 	3. This notice may not be removed or altered from any source distribution.
-
+	  
 */
 
 #pragma once
 
-#include "TComponent.h"
+#include "TWinMenuItem.h"
+#include "TWindow.h"
+#include "../containers/TLeakDetector.h"
 
-/**
-	Base class of all W32 child components
-*/
-class TControl : public TComponent
+class TWinMenu
 {
-public:
-	TControl()
-	{
-		leftProperty = 0;
-		topProperty = 0;
+protected:
+	HMENU hMenu;
 
-		styleProperty = WS_CHILD | WS_CLIPSIBLINGS;
-	}
+public:
+	TWinMenu();
+
+	virtual void add(TWinMenuItem& menuItem);
+
+	virtual void addSubMenu(const TString& text, const TWinMenu& menu);
+
+	virtual void addSeperator();
+
+	virtual HMENU getMenuHandle();
+
+	operator HMENU()const;
+
+	virtual void popUpMenu(TWindow& window);
+
+	virtual ~TWinMenu();
 
 private:
-	// control will create itself when you assign parent to it!
-	virtual void setParentImpl(HWND parentHandle) override
-	{
-		parentProperty = parentHandle;
-		this->create();
-	}
+	MCL_LEAK_DETECTOR(TWinMenu)
 };

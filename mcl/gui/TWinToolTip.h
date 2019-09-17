@@ -1,8 +1,8 @@
 
 /*
-	MCL - TControl.h
+	MCL - TWinToolTip.h
 	Copyright (C) 2019 CrownSoft
-
+  
 	This software is provided 'as-is', without any express or implied
 	warranty.  In no event will the authors be held liable for any damages
 	arising from the use of this software.
@@ -18,32 +18,38 @@
 	2. Altered source versions must be plainly marked as such, and must not be
 	   misrepresented as being the original software.
 	3. This notice may not be removed or altered from any source distribution.
-
+	  
 */
 
 #pragma once
 
-#include "TComponent.h"
+#include "TWindow.h"
+#include "TControl.h"
 
-/**
-	Base class of all W32 child components
-*/
-class TControl : public TComponent
+class TWinToolTip : public TControl
 {
-public:
-	TControl()
-	{
-		leftProperty = 0;
-		topProperty = 0;
+protected:
+	HWND attachedControl;
 
-		styleProperty = WS_CHILD | WS_CLIPSIBLINGS;
-	}
+public:
+	TWinToolTip();
+
+	virtual ~TWinToolTip();
+
+	/**
+		parentWindow must be created before you call this method.
+		attachedControl must be created before you call this method.
+		do not attach same tooltip into multiple controls.
+	*/
+	virtual void attachToControl(TWindow *parentWindow, TControl *attachedControl);
+
+	/**
+		calling this method has no effect.
+	*/
+	virtual bool create() override;
 
 private:
-	// control will create itself when you assign parent to it!
-	virtual void setParentImpl(HWND parentHandle) override
-	{
-		parentProperty = parentHandle;
-		this->create();
-	}
+	virtual void setTextImpl(const TString& caption) override;
 };
+
+

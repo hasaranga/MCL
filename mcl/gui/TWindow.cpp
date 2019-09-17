@@ -41,7 +41,7 @@ TWindow::TWindow()
 	lastFocusedChild = 0;
 }
 
-void TWindow::setParent(HWND parentHandle)
+void TWindow::setParentImpl(HWND parentHandle)
 {
 	parentProperty = parentHandle;
 	if (handleProperty)
@@ -203,7 +203,7 @@ LRESULT TWindow::windowProcHandler(TMessage& message)
 			{
 				if( (HIWORD(message.wParam) == 0) && (message.lParam == 0) ) // its menu item! unfortunately windows does not send menu handle with clicked event!
 				{
-					TMenuItem *menuItem = TPlatformUtil::getInstance()->getMenuItemByID(LOWORD(message.wParam));
+					TWinMenuItem *menuItem = TPlatformUtil::getInstance()->getMenuItemByID(LOWORD(message.wParam));
 					if(menuItem)
 					{
 						if (menuItem->onPress) // is event assigned

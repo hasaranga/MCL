@@ -4,16 +4,16 @@
 
 class MyApplication : public TApplication
 {
-	TForm form1, form2;
-	TButton button1;
-	TEditBox editBox1;
-	TLabel label1;
-	TTextArea textArea1;
-	TCheckBox checkBox1, checkBox2;
-	TRadioButton radioButton1, radioButton2;
-	TMenuBar menuBar;
-	TMenu fileMenu, helpMenu;
-	TMenuItem miExit, miAbout;
+	TWinForm form1, form2;
+	TWinButton button1;
+	TWinEditBox editBox1;
+	TWinLabel label1;
+	TWinTextArea textArea1;
+	TWinCheckBox checkBox1, checkBox2;
+	TWinRadioButton radioButton1, radioButton2;
+	TWinMenuBar menuBar;
+	TWinMenu fileMenu, helpMenu;
+	TWinMenuItem miExit, miAbout;
 
 public:
 
@@ -98,8 +98,8 @@ public:
 		form1.centerScreen();
 
 		form2.text = "About";
-		form2.formType = TForm::FormTypes::TDIALOG;
-		form2.closeBehaviour = TForm::CloseBehaviour::DO_NOTHING;
+		form2.formType = TWinForm::FormTypes::TDIALOG;
+		form2.closeBehaviour = TWinForm::CloseBehaviour::DO_NOTHING;
 		form2.onClose = EVENT(this, MyApplication::onAboutWindowClose);
 		form2.parent = form1;
 		form2.width = 400;

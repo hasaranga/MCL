@@ -54,29 +54,46 @@ public:
 
 	/**
 		@param resolution timer interval
+		(Please override the "Impl" method to change the behaviour!)
 	*/
-	virtual void setInterval(int resolution);
+	inline void setInterval(int resolution) { setIntervalImpl(resolution); }
 
-	virtual int getInterval();
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline int getInterval() { return getIntervalImpl(); }
 
 	/**
 		Call this method before you start the timer
+		(Please override the "Impl" method to change the behaviour!)
 	*/
-	virtual void setTimerWindow(TWindow &window);
+	inline void setTimerWindow(TWindow &window) { setTimerWindowImpl(window); }
 
 	virtual void setTimerID(UINT timerID);
 
-	virtual void setEnabled(bool enable);
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline void setEnabled(bool enable) { setEnabledImpl(enable); }
 
 	/**
 		@returns unique id of this timer
 	*/
 	virtual UINT getTimerID();
 
-	virtual bool isTimerRunning();
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline bool isTimerRunning() { return isTimerRunningImpl(); }
 
 	virtual ~TTimer();
 
 private:
+	virtual void setIntervalImpl(int resolution);
+	virtual int getIntervalImpl();
+	virtual bool isTimerRunningImpl();
+	virtual void setEnabledImpl(bool enable);
+	virtual void setTimerWindowImpl(TWindow &window);
+
 	MCL_LEAK_DETECTOR(TTimer)
 };

@@ -89,19 +89,19 @@ UINT TComponent::getControlID()
 	return controlID;
 }
 
-void TComponent::setCursor(HCURSOR cursorHandle)
+void TComponent::setCursorImpl(HCURSOR cursorHandle)
 {
 	cursorProperty = cursorHandle;
 	if(handleProperty)
 		::SetClassLongPtrW(handleProperty, GCLP_HCURSOR, (LONG_PTR)cursorProperty);
 }
 
-HCURSOR TComponent::getCursor()
+HCURSOR TComponent::getCursorImpl()
 {
 	return cursorProperty;
 }
 
-TString TComponent::getClassName()
+TString TComponent::getClassNameImpl()
 {
 	return classNameProperty;
 }
@@ -227,24 +227,24 @@ LRESULT TComponent::dispatchToDefaultProc(TMessage& message)
 	return ::DefWindowProcW(message.hwnd, message.msg, message.wParam, message.lParam); // custom control or window
 }
 
-void TComponent::setFont(HFONT fontHandle)
+void TComponent::setFontImpl(HFONT fontHandle)
 {
 	fontProperty = fontHandle;
 	if(handleProperty)
 		::SendMessageW(handleProperty, WM_SETFONT, (WPARAM)fontProperty, MAKELPARAM(true, 0));
 }
 
-HFONT TComponent::getFont()
+HFONT TComponent::getFontImpl()
 {
 	return fontProperty;
 }
 
-TString TComponent::getText()
+TString TComponent::getTextImpl()
 {
 	return textProperty;
 }
 
-void TComponent::setText(const TString& caption)
+void TComponent::setTextImpl(const TString& caption)
 {
 	textProperty = caption;
 	if(handleProperty)
@@ -256,73 +256,73 @@ void TComponent::setHandle(HWND hwnd)
 	handleProperty = hwnd;
 }
 
-HWND TComponent::getHandle()
+HWND TComponent::getHandleImpl()
 {
 	return handleProperty;
 }
 
-void TComponent::setParent(HWND parentHandle)
+void TComponent::setParentImpl(HWND parentHandle)
 {
 	parentProperty = parentHandle;
 	if(handleProperty)
 		::SetParent(handleProperty, parentProperty);
 }
 
-HWND TComponent::getParent()
+HWND TComponent::getParentImpl()
 {
 	return parentProperty;
 }
 
-DWORD TComponent::getStyle()
+DWORD TComponent::getStyleImpl()
 {
 	return styleProperty;
 }
 
-void TComponent::setStyle(DWORD compStyle)
+void TComponent::setStyleImpl(DWORD compStyle)
 {
 	styleProperty = compStyle;
 	if(handleProperty)
 		::SetWindowLongPtrW(handleProperty, GWL_STYLE, styleProperty);
 }
 
-DWORD TComponent::getExtendedStyle()
+DWORD TComponent::getExtendedStyleImpl()
 {
 	return extendedStyleProperty;
 }
 
-void TComponent::setExtendedStyle(DWORD compExStyle)
+void TComponent::setExtendedStyleImpl(DWORD compExStyle)
 {
 	extendedStyleProperty = compExStyle;
 	if(handleProperty)
 		::SetWindowLongPtrW(handleProperty, GWL_EXSTYLE, extendedStyleProperty);
 }
 
-int TComponent::getLeft()
+int TComponent::getLeftImpl()
 {
 	return leftProperty; 
 }
 
-int TComponent::getTop()
+int TComponent::getTopImpl()
 {
 	return topProperty;
 }
 
-int TComponent::getWidth()
+int TComponent::getWidthImpl()
 {
 	return widthProperty;
 }
 
-int TComponent::getHeight()
+int TComponent::getHeightImpl()
 {
 	return heightProperty;
 }
 
-void TComponent::setLeft(int compLeft)
+void TComponent::setLeftImpl(int compLeft)
 {
 	this->setPosition(compLeft, topProperty);
 }
 
-void TComponent::setTop(int compTop)
+void TComponent::setTopImpl(int compTop)
 {
 	this->setPosition(leftProperty, compTop);
 }
@@ -336,12 +336,12 @@ void TComponent::setPosition(int compLeft, int compTop)
 		::SetWindowPos(handleProperty, 0, leftProperty, topProperty, 0, 0, SWP_NOSIZE | SWP_NOREPOSITION | SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-void TComponent::setWidth(int compWidth)
+void TComponent::setWidthImpl(int compWidth)
 {
 	this->setSize(compWidth, heightProperty);
 }
 
-void TComponent::setHeight(int compHeight)
+void TComponent::setHeightImpl(int compHeight)
 {
 	this->setSize(widthProperty, compHeight);
 }
@@ -355,14 +355,14 @@ void TComponent::setSize(int compWidth, int compHeight)
 		::SetWindowPos(handleProperty, 0, 0, 0, widthProperty, heightProperty, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-void TComponent::setVisible(bool state)
+void TComponent::setVisibleImpl(bool state)
 {
 	visibleProperty = state;
 	if(handleProperty)
 		::ShowWindow(handleProperty, visibleProperty ? SW_SHOW : SW_HIDE);
 }
 
-bool TComponent::getVisible()
+bool TComponent::getVisibleImpl()
 {
 	if (handleProperty)
 		visibleProperty = (::IsWindowVisible(handleProperty) == TRUE);
@@ -380,7 +380,7 @@ void TComponent::hide()
 	this->setVisible(false);
 }
 
-bool TComponent::getEnabled()
+bool TComponent::getEnabledImpl()
 {
 	if (handleProperty)
 		enabledProperty = (::IsWindowEnabled(handleProperty) == TRUE);
@@ -388,7 +388,7 @@ bool TComponent::getEnabled()
 	return enabledProperty;
 }
 
-void TComponent::setEnabled(bool state)
+void TComponent::setEnabledImpl(bool state)
 {
 	enabledProperty = state;
 

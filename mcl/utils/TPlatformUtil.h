@@ -27,7 +27,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "../containers/TPointerList.h"
-#include "../gui/TMenuItem.h"
+#include "../gui/TWinMenuItem.h"
 #include "../threads/TTimer.h"
 
 /**
@@ -48,7 +48,7 @@ protected:
 	volatile int controlCount;
 	volatile UINT menuItemCount;
 
-	TPointerList<TMenuItem*> *menuItemList;
+	TPointerList<TWinMenuItem*> *menuItemList;
 	TPointerList<TTimer*> *timerList;
 
 	CRITICAL_SECTION criticalSectionForCount;
@@ -62,8 +62,8 @@ public:
 	// TApplication:hInstance must be valid before calling this method
 	TString generateClassName();
 
-	UINT generateMenuItemID(TMenuItem *menuItem);
-	TMenuItem* getMenuItemByID(UINT id);
+	UINT generateMenuItemID(TWinMenuItem *menuItem);
+	TWinMenuItem* getMenuItemByID(UINT id);
 
 	UINT generateTimerID(TTimer *timer);
 	TTimer* getTimerByID(UINT id);

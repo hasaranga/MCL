@@ -1,8 +1,8 @@
 
 /*
-	MCL - TControl.h
+	MCL - TWinCheckBox.h
 	Copyright (C) 2019 CrownSoft
-
+  
 	This software is provided 'as-is', without any express or implied
 	warranty.  In no event will the authors be held liable for any damages
 	arising from the use of this software.
@@ -18,32 +18,45 @@
 	2. Altered source versions must be plainly marked as such, and must not be
 	   misrepresented as being the original software.
 	3. This notice may not be removed or altered from any source distribution.
-
+	  
 */
 
 #pragma once
 
-#include "TComponent.h"
+#include "TControl.h"
 
-/**
-	Base class of all W32 child components
-*/
-class TControl : public TComponent
+class TWinCheckBox : public TControl
 {
-public:
-	TControl()
-	{
-		leftProperty = 0;
-		topProperty = 0;
+protected:
+	bool valueProperty;
 
-		styleProperty = WS_CHILD | WS_CLIPSIBLINGS;
-	}
+public:
+
+	PROPERTY_DEF(bool, value, getValue, setValue)
+
+	// void onCheck(TComponent* sender)
+	EVENT_DEF(void, onCheck, TComponent*)
+
+	TWinCheckBox();
+
+	virtual bool create() override;
+
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline bool getValue() { return getValueImpl(); }
+
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline void setValue(bool state) { setValueImpl(state); }
+
+	virtual bool notifyProcHandler(TMessage& message, LRESULT& result) override;
+
+	virtual ~TWinCheckBox();
 
 private:
-	// control will create itself when you assign parent to it!
-	virtual void setParentImpl(HWND parentHandle) override
-	{
-		parentProperty = parentHandle;
-		this->create();
-	}
+	virtual bool getValueImpl();
+	virtual void setValueImpl(bool state);
+
 };

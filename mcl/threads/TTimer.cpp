@@ -36,17 +36,17 @@ TTimer::TTimer()
 	timerID = TPlatformUtil::getInstance()->generateTimerID(this);
 }
 
-void TTimer::setInterval(int resolution)
+void TTimer::setIntervalImpl(int resolution)
 {
 	this->resolution = resolution;
 }
 
-int TTimer::getInterval()
+int TTimer::getIntervalImpl()
 {
 	return resolution;
 }
 
-void TTimer::setTimerWindow(TWindow &window)
+void TTimer::setTimerWindowImpl(TWindow &window)
 {
 	ownerWindow = &window;
 }
@@ -61,7 +61,7 @@ UINT TTimer::getTimerID()
 	return timerID;
 }
 
-void TTimer::setEnabled(bool enable)
+void TTimer::setEnabledImpl(bool enable)
 {
 	if (enable)
 	{
@@ -94,7 +94,7 @@ void TTimer::setEnabled(bool enable)
 	}
 }
 
-bool TTimer::isTimerRunning()
+bool TTimer::isTimerRunningImpl()
 {
 	return started;
 }

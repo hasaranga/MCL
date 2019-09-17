@@ -33,10 +33,11 @@ protected:
 public:
 	TWindow();
 
-	// change the owner of this window
-	virtual void setParent(HWND parentHandle) override;
-
 	virtual LRESULT windowProcHandler(TMessage& message) override;
 
 	virtual ~TWindow();
+
+private:
+	// change the owner of this window
+	virtual void setParentImpl(HWND parentHandle) override;
 };

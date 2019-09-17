@@ -54,12 +54,12 @@ public:
 	/** 
 		If the file does not exist, it will be created.
 	*/
-	TFile(const TString& fileName, DWORD desiredAccess = TFile::TBOTH, bool autoCloseHandle = true);
+	TFile(const TString& fileName, DWORD desiredAccess = TFile::FileAccessTypes::TBOTH, bool autoCloseHandle = true);
 
 	/** 
 		If the file does not exist, it will be created.
 	*/
-	virtual bool openFile(const TString& fileName, DWORD desiredAccess = TFile::TBOTH, bool autoCloseHandle = true);
+	virtual bool openFile(const TString& fileName, DWORD desiredAccess = TFile::FileAccessTypes::TBOTH, bool autoCloseHandle = true);
 
 	virtual bool closeFile();
 

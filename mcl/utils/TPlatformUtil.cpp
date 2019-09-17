@@ -66,12 +66,12 @@ UINT TPlatformUtil::generateControlID()
 	return retVal;
 }
 
-UINT TPlatformUtil::generateMenuItemID(TMenuItem *menuItem)
+UINT TPlatformUtil::generateMenuItemID(TWinMenuItem *menuItem)
 {
 	::EnterCriticalSection(&criticalSectionForCount);
 
 	if (menuItemList == 0) // generate on first call
-		menuItemList = new TPointerList<TMenuItem*>(mcl_InitialMenuItemCount);
+		menuItemList = new TPointerList<TWinMenuItem*>(mcl_InitialMenuItemCount);
 
 	++menuItemCount;
 	menuItemList->addPointer(menuItem);
@@ -82,7 +82,7 @@ UINT TPlatformUtil::generateMenuItemID(TMenuItem *menuItem)
 	return retVal;
 }
 
-TMenuItem* TPlatformUtil::getMenuItemByID(UINT id)
+TWinMenuItem* TPlatformUtil::getMenuItemByID(UINT id)
 {
 	if (menuItemList)
 		return menuItemList->getPointer(id - (mcl_InitialMenuItemID + 1));

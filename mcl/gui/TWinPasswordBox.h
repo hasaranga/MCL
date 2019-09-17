@@ -1,8 +1,8 @@
 
 /*
-	MCL - TControl.h
+	MCL - TWinPasswordBox.h
 	Copyright (C) 2019 CrownSoft
-
+  
 	This software is provided 'as-is', without any express or implied
 	warranty.  In no event will the authors be held liable for any damages
 	arising from the use of this software.
@@ -18,32 +18,39 @@
 	2. Altered source versions must be plainly marked as such, and must not be
 	   misrepresented as being the original software.
 	3. This notice may not be removed or altered from any source distribution.
-
+	  
 */
 
 #pragma once
 
-#include "TComponent.h"
+#include "TWinEditBox.h"
 
-/**
-	Base class of all W32 child components
-*/
-class TControl : public TComponent
+class TWinPasswordBox : public TWinEditBox
 {
-public:
-	TControl()
-	{
-		leftProperty = 0;
-		topProperty = 0;
+protected:
+	char passwordCharProperty;
 
-		styleProperty = WS_CHILD | WS_CLIPSIBLINGS;
-	}
+public:
+
+	PROPERTY_DEF(char, passwordChar, getPasswordChar, setPasswordChar)
+
+	TWinPasswordBox();
+
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline void setPasswordChar(const char pwdChar) { setPasswordCharImpl(pwdChar); }
+
+	/**
+		(Please override the "Impl" method to change the behaviour!)
+	*/
+	inline char getPasswordChar() { return getPasswordCharImpl(); }
+
+	virtual bool create();
+
+	virtual ~TWinPasswordBox();
 
 private:
-	// control will create itself when you assign parent to it!
-	virtual void setParentImpl(HWND parentHandle) override
-	{
-		parentProperty = parentHandle;
-		this->create();
-	}
+	virtual void setPasswordCharImpl(const char pwdChar);
+	virtual char getPasswordCharImpl();
 };
