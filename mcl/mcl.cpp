@@ -30,6 +30,8 @@ public:
 	static TComponent *currentComponent;
 	static HHOOK wnd_hook;
 	static volatile int mclRefCount;
+	static Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	static ULONG_PTR gdiplusToken;
 
 	static CRITICAL_SECTION csForCurrentComponent; // guard currentComponent!
 };
@@ -37,6 +39,8 @@ public:
 TComponent*	InternalVariables::currentComponent = 0;
 HHOOK InternalVariables::wnd_hook = 0;
 volatile int InternalVariables::mclRefCount = 0;
+Gdiplus::GdiplusStartupInput InternalVariables::gdiplusStartupInput;
+ULONG_PTR InternalVariables::gdiplusToken;
 
 CRITICAL_SECTION InternalVariables::csForCurrentComponent;
 
@@ -200,6 +204,8 @@ void InitMCL(HINSTANCE hInstance)
 
 		::InitializeCriticalSection(&InternalVariables::csForCurrentComponent);
 
+		Gdiplus::GdiplusStartup(&InternalVariables::gdiplusToken, &InternalVariables::gdiplusStartupInput, NULL); // Initialize GDI+.
+
 		InternalDefinitions::MCLPropAtom_Component = ::GlobalAddAtomW(L"MCLComponent");
 		InternalDefinitions::MCLPropAtom_OldProc = ::GlobalAddAtomW(L"MCLOldProc");
 	}
@@ -215,6 +221,8 @@ void DeInitMCL()
 	{
 		::CoUninitialize();
 		::DeleteCriticalSection(&InternalVariables::csForCurrentComponent);
+
+		Gdiplus::GdiplusShutdown(InternalVariables::gdiplusToken);
 
 		::GlobalDeleteAtom(InternalDefinitions::MCLPropAtom_Component);
 		::GlobalDeleteAtom(InternalDefinitions::MCLPropAtom_OldProc);

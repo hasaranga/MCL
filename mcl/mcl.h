@@ -25,6 +25,9 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <dwmapi.h>
+#include <windowsx.h>
+#include <gdiplus.h>
 
 #ifdef _MSC_VER
 	#include <crtdbg.h>
@@ -36,6 +39,9 @@
 	#pragma comment(lib, "Comctl32.lib")
 	#pragma comment(lib, "Rpcrt4.lib")
 	#pragma comment(lib, "Winhttp.lib")
+	#pragma comment(lib, "dwmapi.lib" )
+	#pragma comment(lib, "UxTheme.lib")
+	#pragma comment(lib, "Gdiplus.lib")
 #endif
 
 #include "config.h"

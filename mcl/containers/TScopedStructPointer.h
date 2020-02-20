@@ -30,7 +30,7 @@ template<class StructType>
 class TReleaseUsingFree
 {
 public:
-	static void free(StructType* structPtr)
+	static void release(StructType* structPtr)
 	{
 		::free(structPtr);
 	}
@@ -40,7 +40,7 @@ template<class StructType>
 class TReleaseUsingTaskMemFree
 {
 public:
-	static void free(StructType* memory)
+	static void release(StructType* memory)
 	{
 		::CoTaskMemFree(memory);
 	}
@@ -98,7 +98,7 @@ public:
 	~TScopedStructPointer()
 	{
 		if (structPointer)
-			ReleaseMethod::Free(structPointer);
+			ReleaseMethod::release(structPointer);
 	}
 
 	/** 
@@ -117,7 +117,7 @@ public:
 			structPointer = newStructPointer;
 
 			if (oldStructPointer)
-				ReleaseMethod::Free(oldStructPointer);
+				ReleaseMethod::release(oldStructPointer);
 		}
 
 		return *this;

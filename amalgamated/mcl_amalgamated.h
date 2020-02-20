@@ -272,7 +272,7 @@ template<class StructType>
 class TReleaseUsingFree
 {
 public:
-	static void free(StructType* structPtr)
+	static void release(StructType* structPtr)
 	{
 		::free(structPtr);
 	}
@@ -282,7 +282,7 @@ template<class StructType>
 class TReleaseUsingTaskMemFree
 {
 public:
-	static void free(StructType* memory)
+	static void release(StructType* memory)
 	{
 		::CoTaskMemFree(memory);
 	}
@@ -340,7 +340,7 @@ public:
 	~TScopedStructPointer()
 	{
 		if (structPointer)
-			ReleaseMethod::Free(structPointer);
+			ReleaseMethod::release(structPointer);
 	}
 
 	/** 
@@ -359,7 +359,7 @@ public:
 			structPointer = newStructPointer;
 
 			if (oldStructPointer)
-				ReleaseMethod::Free(oldStructPointer);
+				ReleaseMethod::release(oldStructPointer);
 		}
 
 		return *this;
@@ -6300,6 +6300,9 @@ private:
 
 #include <windows.h>
 #include <commctrl.h>
+#include <dwmapi.h>
+#include <windowsx.h>
+#include <gdiplus.h>
 
 #ifdef _MSC_VER
 	#include <crtdbg.h>
@@ -6311,6 +6314,9 @@ private:
 	#pragma comment(lib, "Comctl32.lib")
 	#pragma comment(lib, "Rpcrt4.lib")
 	#pragma comment(lib, "Winhttp.lib")
+	#pragma comment(lib, "dwmapi.lib" )
+	#pragma comment(lib, "UxTheme.lib")
+	#pragma comment(lib, "Gdiplus.lib")
 #endif
 
 
